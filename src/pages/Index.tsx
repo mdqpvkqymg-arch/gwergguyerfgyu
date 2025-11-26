@@ -1,104 +1,230 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import UsersList from "@/components/UsersList";
-import { MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LogOut, MessageCircle } from "lucide-react";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
-  message: string;
-  sender: string;
-  timestamp: string;
-  senderId: string;
+  content: string;
+  sender_id: string;
+  created_at: string;
+  profiles: {
+    display_name: string;
+    avatar_color: string;
+  };
+}
+
+interface Profile {
+  id: string;
+  display_name: string;
+  avatar_color: string;
 }
 
 const Index = () => {
-  const currentUserId = "user1";
-  
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      message: "Hey everyone! Welcome to Scalk! 👋",
-      sender: "Alice Johnson",
-      timestamp: "10:30 AM",
-      senderId: "user2",
-    },
-    {
-      id: "2",
-      message: "Hi Alice! This looks amazing!",
-      sender: "You",
-      timestamp: "10:31 AM",
-      senderId: currentUserId,
-    },
-    {
-      id: "3",
-      message: "Really loving the clean interface here!",
-      sender: "Bob Smith",
-      timestamp: "10:32 AM",
-      senderId: "user3",
-    },
-  ]);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  const users = [
-    { id: currentUserId, name: "You", isOnline: true, avatarColor: "bg-primary text-primary-foreground" },
-    { id: "user2", name: "Alice Johnson", isOnline: true, avatarColor: "bg-accent text-accent-foreground" },
-    { id: "user3", name: "Bob Smith", isOnline: true, avatarColor: "bg-secondary text-secondary-foreground" },
-    { id: "user4", name: "Carol White", isOnline: false, avatarColor: "bg-muted text-muted-foreground" },
-  ];
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (!session) {
+          navigate("/auth");
+        }
+      }
+    );
 
-  const getAvatarColor = (senderId: string) => {
-    const user = users.find(u => u.id === senderId);
-    return user?.avatarColor || "bg-muted text-muted-foreground";
-  };
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (!session) {
+        navigate("/auth");
+      }
+    });
 
-  const handleSendMessage = (messageText: string) => {
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      message: messageText,
-      sender: "You",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      senderId: currentUserId,
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Fetch current user's profile
+    const fetchCurrentProfile = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
+      setCurrentProfile(data);
     };
-    setMessages([...messages, newMessage]);
+
+    fetchCurrentProfile();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    // Fetch messages
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*, profiles(display_name, avatar_color)")
+        .order("created_at", { ascending: true });
+      
+      if (error) {
+        console.error("Error fetching messages:", error);
+        return;
+      }
+      setMessages(data || []);
+    };
+
+    // Fetch profiles
+    const fetchProfiles = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*");
+      
+      if (error) {
+        console.error("Error fetching profiles:", error);
+        return;
+      }
+      setProfiles(data || []);
+    };
+
+    fetchMessages();
+    fetchProfiles();
+
+    // Subscribe to new messages
+    const channel = supabase
+      .channel("messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+        },
+        async (payload) => {
+          const { data: profileData } = await supabase
+            .from("profiles")
+            .select("display_name, avatar_color")
+            .eq("id", payload.new.sender_id)
+            .single();
+
+          setMessages((current) => [
+            ...current,
+            {
+              ...payload.new,
+              profiles: profileData,
+            } as Message,
+          ]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSendMessage = async (messageText: string) => {
+    if (!currentProfile) return;
+
+    const { error } = await supabase.from("messages").insert({
+      content: messageText,
+      sender_id: currentProfile.id,
+    });
+
+    if (error) {
+      toast.error("Failed to send message");
+      console.error("Error sending message:", error);
+    }
   };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out successfully");
+  };
+
+  if (!user || !currentProfile) {
+    return null;
+  }
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <header className="bg-card border-b border-border px-6 py-4 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-md">
-              <MessageCircle className="h-6 w-6 text-primary-foreground" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-md">
+                <MessageCircle className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Scalk</h1>
+                <p className="text-sm text-muted-foreground">Real-time Chat</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Scalk</h1>
-              <p className="text-sm text-muted-foreground">Modern messaging made simple</p>
-            </div>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
           </div>
         </header>
 
-        {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-1">
+        <div className="flex-1 overflow-y-auto p-6">
           {messages.map((msg) => (
             <ChatMessage
               key={msg.id}
-              message={msg.message}
-              sender={msg.sender}
-              timestamp={msg.timestamp}
-              isCurrentUser={msg.senderId === currentUserId}
-              avatarColor={getAvatarColor(msg.senderId)}
+              message={msg.content}
+              sender={msg.profiles.display_name}
+              timestamp={new Date(msg.created_at).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              isCurrentUser={msg.sender_id === currentProfile.id}
+              avatarColor={msg.profiles.avatar_color}
             />
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
 
-      {/* Users Sidebar */}
-      <UsersList users={users} currentUserId={currentUserId} />
+      <UsersList
+        users={profiles.map((p) => ({
+          id: p.id,
+          name: p.display_name,
+          isOnline: true,
+          avatarColor: p.avatar_color,
+        }))}
+        currentUserId={currentProfile.id}
+      />
     </div>
   );
 };
