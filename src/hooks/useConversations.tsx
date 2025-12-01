@@ -82,6 +82,13 @@ export const useConversations = (currentProfileId: string | null) => {
     if (!currentProfileId) return null;
 
     try {
+      // Check authentication first
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("You must be logged in to create a conversation");
+        return null;
+      }
+
       // Create conversation
       const { data: conversation, error: convError } = await supabase
         .from("conversations")
@@ -92,7 +99,10 @@ export const useConversations = (currentProfileId: string | null) => {
         .select()
         .single();
 
-      if (convError) throw convError;
+      if (convError) {
+        console.error("Conversation creation error:", convError);
+        throw convError;
+      }
 
       // Add members (including current user)
       const allMemberIds = [...new Set([currentProfileId, ...memberIds])];
