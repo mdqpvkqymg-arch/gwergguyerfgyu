@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { LogOut, MessageCircle, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
+import { usePresence } from "@/hooks/usePresence";
+import UsersList from "@/components/UsersList";
 
 interface Message {
   id: string;
@@ -41,6 +43,11 @@ const Index = () => {
   const navigate = useNavigate();
   
   const { conversations, createConversation } = useConversations(currentProfile?.id || null);
+  const onlineUsers = usePresence(
+    currentProfile?.id || null,
+    currentProfile?.display_name || "",
+    currentProfile?.avatar_color || "#3B82F6"
+  );
 
   useEffect(() => {
     // Set up auth state listener
@@ -272,6 +279,8 @@ const Index = () => {
             <ChatInput onSendMessage={handleSendMessage} />
           )}
         </div>
+
+        <UsersList users={onlineUsers} currentUserId={currentProfile.id} />
       </div>
 
       <NewConversationDialog
