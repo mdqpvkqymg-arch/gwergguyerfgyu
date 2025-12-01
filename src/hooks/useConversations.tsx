@@ -79,15 +79,28 @@ export const useConversations = (currentProfileId: string | null) => {
     isGroup: boolean,
     name?: string
   ) => {
-    if (!currentProfileId) return null;
+    if (!currentProfileId) {
+      console.error("No current profile ID");
+      toast.error("Profile not loaded");
+      return null;
+    }
 
     try {
-      // Check authentication first
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      // Check authentication and session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error("No active session:", sessionError);
         toast.error("You must be logged in to create a conversation");
         return null;
       }
+
+      console.log("Creating conversation with session:", {
+        userId: session.user.id,
+        hasAccessToken: !!session.access_token,
+        isGroup,
+        memberCount: memberIds.length
+      });
 
       // Create conversation
       const { data: conversation, error: convError } = await supabase
@@ -100,7 +113,12 @@ export const useConversations = (currentProfileId: string | null) => {
         .single();
 
       if (convError) {
-        console.error("Conversation creation error:", convError);
+        console.error("Conversation creation error:", {
+          message: convError.message,
+          details: convError.details,
+          hint: convError.hint,
+          code: convError.code
+        });
         throw convError;
       }
 
