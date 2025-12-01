@@ -20,12 +20,12 @@ export const usePresence = (currentProfileId: string | null, displayName: string
     channel
       .on("presence", { event: "sync" }, () => {
         const state = channel.presenceState();
-        const users: OnlineUser[] = [];
+        const uniqueUsers = new Map<string, OnlineUser>();
         
         Object.keys(state).forEach((key) => {
           const presences = state[key] as any[];
           presences.forEach((presence) => {
-            users.push({
+            uniqueUsers.set(presence.profile_id, {
               id: presence.profile_id,
               name: presence.display_name,
               isOnline: true,
@@ -34,7 +34,7 @@ export const usePresence = (currentProfileId: string | null, displayName: string
           });
         });
         
-        setOnlineUsers(users);
+        setOnlineUsers(Array.from(uniqueUsers.values()));
       })
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
