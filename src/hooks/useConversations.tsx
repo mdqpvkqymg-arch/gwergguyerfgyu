@@ -79,64 +79,18 @@ export const useConversations = (currentProfileId: string | null) => {
     isGroup: boolean,
     name?: string
   ) => {
-    if (!currentProfileId) {
-      console.error("No current profile ID");
-      toast.error("Profile not loaded");
-      return null;
-    }
-
     try {
-      // Check authentication and session
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error("No active session:", sessionError);
-        toast.error("You must be logged in to create a conversation");
-        return null;
-      }
-
-      console.log("Creating conversation with session:", {
-        userId: session.user.id,
-        hasAccessToken: !!session.access_token,
-        isGroup,
-        memberCount: memberIds.length
+      // Use database function to create conversation atomically
+      const { data, error } = await supabase.rpc("create_conversation", {
+        p_member_ids: memberIds,
+        p_is_group: isGroup,
+        p_name: isGroup ? name : null,
       });
 
-      // Create conversation
-      const { data: conversation, error: convError } = await supabase
-        .from("conversations")
-        .insert({
-          name: isGroup ? name : null,
-          is_group: isGroup,
-        })
-        .select()
-        .single();
-
-      if (convError) {
-        console.error("Conversation creation error:", {
-          message: convError.message,
-          details: convError.details,
-          hint: convError.hint,
-          code: convError.code
-        });
-        throw convError;
-      }
-
-      // Add members (including current user)
-      const allMemberIds = [...new Set([currentProfileId, ...memberIds])];
-      const { error: membersError } = await supabase
-        .from("conversation_members")
-        .insert(
-          allMemberIds.map((id) => ({
-            conversation_id: conversation.id,
-            profile_id: id,
-          }))
-        );
-
-      if (membersError) throw membersError;
+      if (error) throw error;
 
       toast.success("Conversation created");
-      return conversation.id;
+      return data;
     } catch (error) {
       console.error("Error creating conversation:", error);
       toast.error("Failed to create conversation");
