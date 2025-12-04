@@ -145,6 +145,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_conversation_members: {
+        Args: { p_conversation_id: string; p_member_ids: string[] }
+        Returns: undefined
+      }
       create_conversation: {
         Args: { p_is_group?: boolean; p_member_ids: string[]; p_name?: string }
         Returns: string

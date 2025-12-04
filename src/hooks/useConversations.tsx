@@ -98,5 +98,23 @@ export const useConversations = (currentProfileId: string | null) => {
     }
   };
 
-  return { conversations, loading, createConversation };
+  const addMembers = async (conversationId: string, memberIds: string[]) => {
+    try {
+      const { error } = await supabase.rpc("add_conversation_members", {
+        p_conversation_id: conversationId,
+        p_member_ids: memberIds,
+      });
+
+      if (error) throw error;
+
+      toast.success("Members added");
+      return true;
+    } catch (error) {
+      console.error("Error adding members:", error);
+      toast.error("Failed to add members");
+      return false;
+    }
+  };
+
+  return { conversations, loading, createConversation, addMembers };
 };
