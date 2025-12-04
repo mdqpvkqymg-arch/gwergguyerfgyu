@@ -45,11 +45,19 @@ const Index = () => {
   const navigate = useNavigate();
   
   const { conversations, createConversation, addMembers } = useConversations(currentProfile?.id || null);
-  const onlineUsers = usePresence(
+  const onlineUserIds = usePresence(
     currentProfile?.id || null,
     currentProfile?.display_name || "",
     currentProfile?.avatar_color || "#3B82F6"
   );
+
+  // Combine all profiles with online status
+  const allUsersWithStatus = profiles.map(profile => ({
+    id: profile.id,
+    name: profile.display_name,
+    isOnline: onlineUserIds.some(ou => ou.id === profile.id),
+    avatarColor: profile.avatar_color
+  }));
 
   useEffect(() => {
     // Set up auth state listener
@@ -296,17 +304,13 @@ const Index = () => {
           )}
         </div>
 
-        <UsersList users={onlineUsers} currentUserId={currentProfile.id} />
+        <UsersList users={allUsersWithStatus} currentUserId={currentProfile.id} />
       </div>
 
       <NewConversationDialog
         open={newConversationOpen}
         onOpenChange={setNewConversationOpen}
-        profiles={onlineUsers.filter(u => u.id !== currentProfile.id).map(u => ({
-          id: u.id,
-          display_name: u.name,
-          avatar_color: u.avatarColor
-        }))}
+        profiles={profiles.filter(p => p.id !== currentProfile.id)}
         currentProfileId={currentProfile.id}
         onCreateConversation={handleCreateConversation}
       />
@@ -315,11 +319,7 @@ const Index = () => {
         <AddMembersDialog
           open={addMembersOpen}
           onOpenChange={setAddMembersOpen}
-          profiles={onlineUsers.map(u => ({
-            id: u.id,
-            display_name: u.name,
-            avatar_color: u.avatarColor
-          }))}
+          profiles={profiles}
           existingMemberIds={selectedConversation.members.map(m => m.profile_id)}
           onAddMembers={handleAddMembers}
         />
