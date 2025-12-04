@@ -286,11 +286,7 @@ const Index = () => {
       <NewConversationDialog
         open={newConversationOpen}
         onOpenChange={setNewConversationOpen}
-        profiles={onlineUsers.filter(u => u.id !== currentProfile.id).map(u => ({
-          id: u.id,
-          display_name: u.name,
-          avatar_color: u.avatarColor
-        }))}
+        profiles={profiles}
         currentProfileId={currentProfile.id}
         onCreateConversation={handleCreateConversation}
       />
