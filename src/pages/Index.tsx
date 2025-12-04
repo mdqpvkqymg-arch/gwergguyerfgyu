@@ -6,8 +6,9 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import ConversationsList from "@/components/ConversationsList";
 import NewConversationDialog from "@/components/NewConversationDialog";
+import AddMembersDialog from "@/components/AddMembersDialog";
 import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle, Plus } from "lucide-react";
+import { LogOut, MessageCircle, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { usePresence } from "@/hooks/usePresence";
@@ -39,10 +40,11 @@ const Index = () => {
   const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [newConversationOpen, setNewConversationOpen] = useState(false);
+  const [addMembersOpen, setAddMembersOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
-  const { conversations, createConversation } = useConversations(currentProfile?.id || null);
+  const { conversations, createConversation, addMembers } = useConversations(currentProfile?.id || null);
   const onlineUsers = usePresence(
     currentProfile?.id || null,
     currentProfile?.display_name || "",
@@ -202,10 +204,18 @@ const Index = () => {
     }
   };
 
+  const handleAddMembers = async (memberIds: string[]) => {
+    if (selectedConversationId) {
+      await addMembers(selectedConversationId, memberIds);
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out successfully");
   };
+
+  const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
   if (!user || !currentProfile) {
     return null;
@@ -234,6 +244,12 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex gap-2">
+                {selectedConversation?.is_group && (
+                  <Button variant="outline" size="sm" onClick={() => setAddMembersOpen(true)}>
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Add Members
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={() => setNewConversationOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   New Chat
@@ -294,6 +310,20 @@ const Index = () => {
         currentProfileId={currentProfile.id}
         onCreateConversation={handleCreateConversation}
       />
+
+      {selectedConversation?.is_group && (
+        <AddMembersDialog
+          open={addMembersOpen}
+          onOpenChange={setAddMembersOpen}
+          profiles={onlineUsers.map(u => ({
+            id: u.id,
+            display_name: u.name,
+            avatar_color: u.avatarColor
+          }))}
+          existingMemberIds={selectedConversation.members.map(m => m.profile_id)}
+          onAddMembers={handleAddMembers}
+        />
+      )}
     </>
   );
 };
