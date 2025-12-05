@@ -12,7 +12,10 @@ import { LogOut, MessageCircle, Plus, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { usePresence } from "@/hooks/usePresence";
+import { useTypingIndicator } from "@/hooks/useTypingIndicator";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import UsersList from "@/components/UsersList";
+import TypingIndicator from "@/components/TypingIndicator";
 
 interface Message {
   id: string;
@@ -50,6 +53,12 @@ const Index = () => {
     currentProfile?.display_name || "",
     currentProfile?.avatar_color || "#3B82F6"
   );
+  const { typingUsers, handleTyping, stopTyping } = useTypingIndicator(
+    selectedConversationId,
+    currentProfile?.id || null,
+    currentProfile?.display_name || ""
+  );
+  const { unreadCounts, markAsRead } = useUnreadMessages(currentProfile?.id || null);
 
   // Combine all profiles with online status
   const allUsersWithStatus = profiles.map(profile => ({
@@ -130,6 +139,9 @@ const Index = () => {
       setMessages([]);
       return;
     }
+
+    // Mark conversation as read when selected
+    markAsRead(selectedConversationId);
 
     // Fetch messages for selected conversation
     const fetchMessages = async () => {
@@ -237,6 +249,7 @@ const Index = () => {
           currentProfileId={currentProfile.id}
           selectedConversationId={selectedConversationId}
           onSelectConversation={setSelectedConversationId}
+          unreadCounts={unreadCounts}
         />
 
         <div className="flex-1 flex flex-col">
@@ -300,7 +313,14 @@ const Index = () => {
           </div>
 
           {selectedConversationId && (
-            <ChatInput onSendMessage={handleSendMessage} />
+            <>
+              <TypingIndicator typingUsers={typingUsers} />
+              <ChatInput 
+                onSendMessage={handleSendMessage} 
+                onTyping={handleTyping}
+                onStopTyping={stopTyping}
+              />
+            </>
           )}
         </div>
 

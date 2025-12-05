@@ -20,6 +20,7 @@ interface ConversationsListProps {
   currentProfileId: string;
   selectedConversationId: string | null;
   onSelectConversation: (id: string) => void;
+  unreadCounts?: Record<string, number>;
 }
 
 const ConversationsList = ({
@@ -27,6 +28,7 @@ const ConversationsList = ({
   currentProfileId,
   selectedConversationId,
   onSelectConversation,
+  unreadCounts = {},
 }: ConversationsListProps) => {
   const getConversationDisplay = (conv: Conversation) => {
     if (conv.is_group) {
@@ -89,6 +91,14 @@ const ConversationsList = ({
                   {conv.members.length} member{conv.members.length !== 1 ? "s" : ""}
                 </p>
               </div>
+
+              {unreadCounts[conv.id] > 0 && (
+                <div className="flex-shrink-0 min-w-5 h-5 px-1.5 bg-primary rounded-full flex items-center justify-center">
+                  <span className="text-xs font-semibold text-primary-foreground">
+                    {unreadCounts[conv.id] > 99 ? "99+" : unreadCounts[conv.id]}
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}
