@@ -110,6 +110,38 @@ export type Database = {
         }
         Relationships: []
       }
+      game_scores: {
+        Row: {
+          created_at: string
+          game_type: string
+          id: string
+          profile_id: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          game_type: string
+          id?: string
+          profile_id: string
+          score: number
+        }
+        Update: {
+          created_at?: string
+          game_type?: string
+          id?: string
+          profile_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_scores_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string

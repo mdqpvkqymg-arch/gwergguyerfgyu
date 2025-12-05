@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Flag, Bomb, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const GRID_SIZE = 10;
 const MINE_COUNT = 15;
@@ -14,7 +15,11 @@ type Cell = {
   adjacentMines: number;
 };
 
-const MinesweeperGame = () => {
+interface MinesweeperGameProps {
+  onScoreSubmit?: (score: number) => Promise<boolean>;
+}
+
+const MinesweeperGame = ({ onScoreSubmit }: MinesweeperGameProps) => {
   const [grid, setGrid] = useState<Cell[][]>(() => createGrid());
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
@@ -25,7 +30,6 @@ const MinesweeperGame = () => {
   });
 
   function createGrid(): Cell[][] {
-    // Create empty grid
     const newGrid: Cell[][] = Array(GRID_SIZE).fill(null).map(() =>
       Array(GRID_SIZE).fill(null).map(() => ({
         isMine: false,
@@ -35,7 +39,6 @@ const MinesweeperGame = () => {
       }))
     );
 
-    // Place mines
     let minesPlaced = 0;
     while (minesPlaced < MINE_COUNT) {
       const x = Math.floor(Math.random() * GRID_SIZE);
@@ -46,7 +49,6 @@ const MinesweeperGame = () => {
       }
     }
 
-    // Calculate adjacent mines
     for (let y = 0; y < GRID_SIZE; y++) {
       for (let x = 0; x < GRID_SIZE; x++) {
         if (!newGrid[y][x].isMine) {
@@ -104,12 +106,11 @@ const MinesweeperGame = () => {
     return true;
   }, []);
 
-  const handleCellClick = useCallback((x: number, y: number) => {
+  const handleCellClick = useCallback(async (x: number, y: number) => {
     if (gameOver || won) return;
     if (grid[y][x].isFlagged || grid[y][x].isRevealed) return;
 
     if (grid[y][x].isMine) {
-      // Reveal all mines
       const newGrid = grid.map(row => row.map(cell => ({
         ...cell,
         isRevealed: cell.isMine ? true : cell.isRevealed,
@@ -127,8 +128,16 @@ const MinesweeperGame = () => {
       const newWins = gamesWon + 1;
       setGamesWon(newWins);
       localStorage.setItem("minesweeperWins", newWins.toString());
+      
+      // Submit win to leaderboard
+      if (onScoreSubmit) {
+        const success = await onScoreSubmit(newWins);
+        if (success) {
+          toast.success(`Win #${newWins} submitted to leaderboard!`);
+        }
+      }
     }
-  }, [grid, gameOver, won, revealCell, checkWin, gamesWon]);
+  }, [grid, gameOver, won, revealCell, checkWin, gamesWon, onScoreSubmit]);
 
   const handleRightClick = useCallback((e: React.MouseEvent, x: number, y: number) => {
     e.preventDefault();

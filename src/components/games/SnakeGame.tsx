@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Play, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 20;
@@ -10,7 +11,11 @@ const INITIAL_SPEED = 150;
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 type Position = { x: number; y: number };
 
-const SnakeGame = () => {
+interface SnakeGameProps {
+  onScoreSubmit?: (score: number) => Promise<boolean>;
+}
+
+const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
   const [snake, setSnake] = useState<Position[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Position>({ x: 15, y: 15 });
   const [direction, setDirection] = useState<Direction>("RIGHT");
@@ -24,6 +29,11 @@ const SnakeGame = () => {
   
   const directionRef = useRef(direction);
   const gameLoopRef = useRef<NodeJS.Timeout | null>(null);
+  const scoreRef = useRef(score);
+
+  useEffect(() => {
+    scoreRef.current = score;
+  }, [score]);
 
   const generateFood = useCallback((currentSnake: Position[]): Position => {
     let newFood: Position;
@@ -36,6 +46,24 @@ const SnakeGame = () => {
     return newFood;
   }, []);
 
+  const handleGameOver = useCallback(async (finalScore: number) => {
+    setGameOver(true);
+    setIsPlaying(false);
+    
+    if (finalScore > highScore) {
+      setHighScore(finalScore);
+      localStorage.setItem("snakeHighScore", finalScore.toString());
+    }
+    
+    // Submit score to leaderboard if > 0
+    if (finalScore > 0 && onScoreSubmit) {
+      const success = await onScoreSubmit(finalScore);
+      if (success) {
+        toast.success(`Score of ${finalScore} submitted to leaderboard!`);
+      }
+    }
+  }, [highScore, onScoreSubmit]);
+
   const resetGame = useCallback(() => {
     const initialSnake = [{ x: 10, y: 10 }];
     setSnake(initialSnake);
@@ -44,6 +72,7 @@ const SnakeGame = () => {
     directionRef.current = "RIGHT";
     setGameOver(false);
     setScore(0);
+    scoreRef.current = 0;
     setIsPlaying(true);
   }, [generateFood]);
 
@@ -60,15 +89,13 @@ const SnakeGame = () => {
 
       // Check wall collision
       if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
-        setGameOver(true);
-        setIsPlaying(false);
+        handleGameOver(scoreRef.current);
         return prevSnake;
       }
 
       // Check self collision
       if (prevSnake.some(seg => seg.x === head.x && seg.y === head.y)) {
-        setGameOver(true);
-        setIsPlaying(false);
+        handleGameOver(scoreRef.current);
         return prevSnake;
       }
 
@@ -78,10 +105,6 @@ const SnakeGame = () => {
       if (head.x === food.x && head.y === food.y) {
         setScore(prev => {
           const newScore = prev + 10;
-          if (newScore > highScore) {
-            setHighScore(newScore);
-            localStorage.setItem("snakeHighScore", newScore.toString());
-          }
           return newScore;
         });
         setFood(generateFood(newSnake));
@@ -91,7 +114,7 @@ const SnakeGame = () => {
 
       return newSnake;
     });
-  }, [food, generateFood, highScore]);
+  }, [food, generateFood, handleGameOver]);
 
   useEffect(() => {
     if (isPlaying && !gameOver) {

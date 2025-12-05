@@ -2,10 +2,15 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Zap, Trophy, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type GameState = "waiting" | "ready" | "go" | "clicked" | "too-early";
 
-const ReactionGame = () => {
+interface ReactionGameProps {
+  onScoreSubmit?: (score: number) => Promise<boolean>;
+}
+
+const ReactionGame = ({ onScoreSubmit }: ReactionGameProps) => {
   const [gameState, setGameState] = useState<GameState>("waiting");
   const [startTime, setStartTime] = useState<number>(0);
   const [reactionTime, setReactionTime] = useState<number | null>(null);
@@ -27,7 +32,7 @@ const ReactionGame = () => {
     }, delay);
   }, []);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback(async () => {
     if (gameState === "waiting") {
       startGame();
     } else if (gameState === "ready") {
@@ -42,11 +47,19 @@ const ReactionGame = () => {
       if (!bestTime || time < bestTime) {
         setBestTime(time);
         localStorage.setItem("bestReactionTime", time.toString());
+        
+        // Submit to leaderboard
+        if (onScoreSubmit) {
+          const success = await onScoreSubmit(time);
+          if (success) {
+            toast.success("New best time submitted to leaderboard!");
+          }
+        }
       }
     } else if (gameState === "too-early" || gameState === "clicked") {
       startGame();
     }
-  }, [gameState, startTime, bestTime, startGame]);
+  }, [gameState, startTime, bestTime, startGame, onScoreSubmit]);
 
   useEffect(() => {
     return () => {
