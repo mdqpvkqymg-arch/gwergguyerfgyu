@@ -18,7 +18,7 @@ const ChatMessage = ({ message, sender, timestamp, isCurrentUser, avatarColor }:
         </AvatarFallback>
       </Avatar>
       
-      <div className={cn("flex flex-col max-w-[70%]", isCurrentUser && "items-end")}>
+      <div className={cn("flex flex-col max-w-[70%] min-w-0", isCurrentUser && "items-end")}>
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-semibold text-foreground">{sender}</span>
           <span className="text-xs text-muted-foreground">{timestamp}</span>
@@ -26,13 +26,13 @@ const ChatMessage = ({ message, sender, timestamp, isCurrentUser, avatarColor }:
         
         <div
           className={cn(
-            "px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md",
+            "px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md overflow-hidden",
             isCurrentUser
               ? "bg-chat-bubble-user text-primary-foreground rounded-br-sm"
               : "bg-chat-bubble-other text-card-foreground border border-border rounded-bl-sm"
           )}
         >
-          <p className="text-sm leading-relaxed break-words">{message}</p>
+          <p className="text-sm leading-relaxed break-all whitespace-pre-wrap">{message}</p>
         </div>
       </div>
     </div>
