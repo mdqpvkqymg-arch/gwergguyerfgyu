@@ -174,7 +174,7 @@ const AI = () => {
           </Button>
           <div className="flex items-center gap-2">
             <Bot className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-semibold">AI Assistant</h1>
+            <h1 className="text-xl font-semibold">Scalk Bot</h1>
           </div>
         </div>
       </div>
@@ -184,11 +184,11 @@ const AI = () => {
           <ScrollArea ref={scrollRef} className="flex-1 p-4">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center text-center">
-                <div className="text-muted-foreground">
-                  <Bot className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <h2 className="text-lg font-medium mb-2">How can I help you today?</h2>
-                  <p className="text-sm">Ask me anything - I'm here to help!</p>
-                </div>
+              <div className="text-muted-foreground">
+                <Bot className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <h2 className="text-lg font-medium mb-2">Hey! I'm Scalk Bot</h2>
+                <p className="text-sm">Ask me anything - I'm here to help!</p>
+              </div>
               </div>
             ) : (
               <div className="space-y-4 pb-4">
