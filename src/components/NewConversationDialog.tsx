@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Profile {
@@ -31,8 +32,16 @@ const NewConversationDialog = ({
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [groupName, setGroupName] = useState("");
   const [isGroup, setIsGroup] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const otherProfiles = profiles.filter((p) => p.id !== currentProfileId);
+
+  const filteredProfiles = useMemo(() => {
+    if (!searchQuery.trim()) return otherProfiles;
+    return otherProfiles.filter((p) =>
+      p.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [otherProfiles, searchQuery]);
 
   const toggleMember = (profileId: string) => {
     setSelectedMembers((prev) =>
@@ -52,6 +61,7 @@ const NewConversationDialog = ({
     setSelectedMembers([]);
     setGroupName("");
     setIsGroup(false);
+    setSearchQuery("");
     onOpenChange(false);
   };
 
@@ -77,8 +87,17 @@ const NewConversationDialog = ({
 
           <div className="space-y-2">
             <Label>Select People</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search people..."
+                className="pl-9"
+              />
+            </div>
             <div className="border border-border rounded-lg max-h-64 overflow-y-auto">
-              {otherProfiles.map((profile) => (
+              {filteredProfiles.map((profile) => (
                 <div
                   key={profile.id}
                   onClick={() => toggleMember(profile.id)}
@@ -101,9 +120,9 @@ const NewConversationDialog = ({
                 </div>
               ))}
 
-              {otherProfiles.length === 0 && (
+              {filteredProfiles.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground text-sm">
-                  No other users available
+                  {searchQuery ? "No matching users found" : "No other users available"}
                 </div>
               )}
             </div>
