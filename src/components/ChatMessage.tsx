@@ -32,7 +32,7 @@ const ChatMessage = ({ message, sender, timestamp, isCurrentUser, avatarColor }:
               : "bg-chat-bubble-other text-card-foreground border border-border rounded-bl-sm"
           )}
         >
-          <p className="text-sm leading-relaxed">{message}</p>
+          <p className="text-sm leading-relaxed break-words">{message}</p>
         </div>
       </div>
     </div>
