@@ -137,15 +137,17 @@ const ConversationsList = ({
                   )}
                 </div>
               </ContextMenuTrigger>
-              <ContextMenuContent>
-                <ContextMenuItem
-                  onClick={() => handleDeleteClick(conv.id)}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete conversation
-                </ContextMenuItem>
-              </ContextMenuContent>
+              {!conv.is_group && (
+                <ContextMenuContent>
+                  <ContextMenuItem
+                    onClick={() => handleDeleteClick(conv.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete conversation
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              )}
             </ContextMenu>
           );
         })}
