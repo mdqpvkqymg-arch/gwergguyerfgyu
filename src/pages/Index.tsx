@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
@@ -60,13 +60,14 @@ const Index = () => {
   );
   const { unreadCounts, markAsRead } = useUnreadMessages(currentProfile?.id || null);
 
-  // Combine all profiles with online status
-  const allUsersWithStatus = profiles.map(profile => ({
-    id: profile.id,
-    name: profile.display_name,
-    isOnline: onlineUserIds.some(ou => ou.id === profile.id),
-    avatarColor: profile.avatar_color
-  }));
+  // Memoize all users with online status to prevent recalculation on every render
+  const allUsersWithStatus = useMemo(() => 
+    profiles.map(profile => ({
+      id: profile.id,
+      name: profile.display_name,
+      isOnline: onlineUserIds.some(ou => ou.id === profile.id),
+      avatarColor: profile.avatar_color
+    })), [profiles, onlineUserIds]);
 
   useEffect(() => {
     // Set up auth state listener
@@ -195,10 +196,13 @@ const Index = () => {
   }, [selectedConversationId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Use requestAnimationFrame for smoother scrolling
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    });
   }, [messages]);
 
-  const handleSendMessage = async (messageText: string) => {
+  const handleSendMessage = useCallback(async (messageText: string) => {
     if (!currentProfile || !selectedConversationId) return;
 
     const { error } = await supabase.from("messages").insert({
@@ -211,9 +215,9 @@ const Index = () => {
       toast.error("Failed to send message");
       console.error("Error sending message:", error);
     }
-  };
+  }, [currentProfile, selectedConversationId]);
 
-  const handleCreateConversation = async (
+  const handleCreateConversation = useCallback(async (
     memberIds: string[],
     isGroup: boolean,
     name?: string
@@ -222,18 +226,26 @@ const Index = () => {
     if (conversationId) {
       setSelectedConversationId(conversationId);
     }
-  };
+  }, [createConversation]);
 
-  const handleAddMembers = async (memberIds: string[]) => {
+  const handleAddMembers = useCallback(async (memberIds: string[]) => {
     if (selectedConversationId) {
       await addMembers(selectedConversationId, memberIds);
     }
-  };
+  }, [selectedConversationId, addMembers]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     toast.success("Signed out successfully");
-  };
+  }, []);
+
+  const handleDeleteConversation = useCallback(async (id: string) => {
+    const success = await deleteConversation(id);
+    if (success && selectedConversationId === id) {
+      setSelectedConversationId("");
+    }
+    return success;
+  }, [deleteConversation, selectedConversationId]);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
@@ -249,13 +261,7 @@ const Index = () => {
           currentProfileId={currentProfile.id}
           selectedConversationId={selectedConversationId}
           onSelectConversation={setSelectedConversationId}
-          onDeleteConversation={async (id) => {
-            const success = await deleteConversation(id);
-            if (success && selectedConversationId === id) {
-              setSelectedConversationId("");
-            }
-            return success;
-          }}
+          onDeleteConversation={handleDeleteConversation}
           unreadCounts={unreadCounts}
         />
 

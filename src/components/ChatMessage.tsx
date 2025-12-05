@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -9,9 +10,9 @@ interface ChatMessageProps {
   avatarColor: string;
 }
 
-const ChatMessage = ({ message, sender, timestamp, isCurrentUser, avatarColor }: ChatMessageProps) => {
+const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarColor }: ChatMessageProps) => {
   return (
-    <div className={cn("flex gap-3 mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300", isCurrentUser && "flex-row-reverse")}>
+    <div className={cn("flex gap-3 mb-4", isCurrentUser && "flex-row-reverse")}>
       <Avatar className={cn("h-10 w-10 border-2", `border-${avatarColor}`)}>
         <AvatarFallback className={cn("font-semibold", avatarColor)}>
           {sender.substring(0, 2).toUpperCase()}
@@ -26,7 +27,7 @@ const ChatMessage = ({ message, sender, timestamp, isCurrentUser, avatarColor }:
         
         <div
           className={cn(
-            "px-4 py-2.5 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md overflow-hidden",
+            "px-4 py-2.5 rounded-2xl shadow-sm overflow-hidden",
             isCurrentUser
               ? "bg-chat-bubble-user text-primary-foreground rounded-br-sm"
               : "bg-chat-bubble-other text-card-foreground border border-border rounded-bl-sm"
@@ -37,6 +38,8 @@ const ChatMessage = ({ message, sender, timestamp, isCurrentUser, avatarColor }:
       </div>
     </div>
   );
-};
+});
+
+ChatMessage.displayName = "ChatMessage";
 
 export default ChatMessage;
