@@ -7,6 +7,7 @@ interface Conversation {
   name: string | null;
   is_group: boolean;
   created_at: string;
+  updated_at: string;
   members: Array<{
     profile_id: string;
     profiles: {
@@ -47,11 +48,11 @@ export const useConversations = (currentProfileId: string | null) => {
         members: conv.conversation_members,
       }));
 
-      // Sort to put "updates" conversation at the top
+      // Sort to put "updates" conversation at the top, then by most recent activity
       const sortedData = mappedData.sort((a: Conversation, b: Conversation) => {
         if (a.name === "updates") return -1;
         if (b.name === "updates") return 1;
-        return 0;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
       });
 
       setConversations(sortedData);
