@@ -14,6 +14,7 @@ const SPAM_CONFIG = {
   cooldownMs: 1000, // 1 second between messages
   maxMessages: 5, // max messages in time window
   timeWindowMs: 10000, // 10 second window
+  maxMessageLength: 5000, // max characters per message
 };
 
 const ChatInput = ({ onSendMessage, onTyping, onStopTyping }: ChatInputProps) => {
@@ -24,7 +25,14 @@ const ChatInput = ({ onSendMessage, onTyping, onStopTyping }: ChatInputProps) =>
 
   const checkSpam = (): boolean => {
     const now = Date.now();
+    const trimmedMessage = message.trim();
     
+    // Check message length
+    if (trimmedMessage.length > SPAM_CONFIG.maxMessageLength) {
+      toast.error(`Message too long. Maximum ${SPAM_CONFIG.maxMessageLength} characters.`);
+      return true;
+    }
+
     // Remove old timestamps outside the time window
     messageTimestamps.current = messageTimestamps.current.filter(
       (ts) => now - ts < SPAM_CONFIG.timeWindowMs
@@ -37,7 +45,7 @@ const ChatInput = ({ onSendMessage, onTyping, onStopTyping }: ChatInputProps) =>
     }
 
     // Check for duplicate consecutive messages
-    if (message.trim().toLowerCase() === lastMessage.current.toLowerCase()) {
+    if (trimmedMessage.toLowerCase() === lastMessage.current.toLowerCase()) {
       toast.error("Please don't send duplicate messages.");
       return true;
     }
@@ -84,6 +92,7 @@ const ChatInput = ({ onSendMessage, onTyping, onStopTyping }: ChatInputProps) =>
         onChange={handleChange}
         placeholder="Type your message..."
         className="flex-1 bg-background border-input focus-visible:ring-primary"
+        maxLength={SPAM_CONFIG.maxMessageLength}
       />
       <Button 
         type="submit" 
