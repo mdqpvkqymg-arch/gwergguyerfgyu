@@ -8,7 +8,7 @@ import ConversationsList from "@/components/ConversationsList";
 import NewConversationDialog from "@/components/NewConversationDialog";
 import AddMembersDialog from "@/components/AddMembersDialog";
 import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle, Plus, UserPlus, Gamepad2 } from "lucide-react";
+import { LogOut, MessageCircle, Plus, UserPlus, Gamepad2, Bot } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { usePresence } from "@/hooks/usePresence";
@@ -292,6 +292,12 @@ const Index = () => {
                   <Link to="/game">
                     <Gamepad2 className="h-4 w-4 mr-2" />
                     Game
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/ai">
+                    <Bot className="h-4 w-4 mr-2" />
+                    AI
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
