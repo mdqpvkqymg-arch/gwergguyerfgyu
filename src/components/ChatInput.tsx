@@ -5,16 +5,26 @@ import { Send } from "lucide-react";
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
+  onTyping?: () => void;
+  onStopTyping?: () => void;
 }
 
-const ChatInput = ({ onSendMessage }: ChatInputProps) => {
+const ChatInput = ({ onSendMessage, onTyping, onStopTyping }: ChatInputProps) => {
   const [message, setMessage] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim()) {
+      onStopTyping?.();
       onSendMessage(message);
       setMessage("");
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+    if (e.target.value) {
+      onTyping?.();
     }
   };
 
@@ -22,7 +32,7 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 bg-card border-t border-border">
       <Input
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleChange}
         placeholder="Type your message..."
         className="flex-1 bg-background border-input focus-visible:ring-primary"
       />
