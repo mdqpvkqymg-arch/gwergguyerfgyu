@@ -52,6 +52,16 @@ All colors MUST be HSL.
     --sidebar-ring: 195 85% 45%;
 
     --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Game colors */
+    --game-snake: 142 76% 45%;
+    --game-snake-glow: 142 76% 55%;
+    --game-food: 350 89% 60%;
+    --game-board: 215 25% 12%;
+    --game-grid: 215 25% 20%;
+    --game-success: 142 76% 45%;
+    --game-danger: 0 72% 51%;
+    --game-warning: 45 93% 58%;
   }
 
   .dark {
@@ -95,7 +105,87 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 210 20% 95%;
     --sidebar-border: 215 25% 20%;
     --sidebar-ring: 195 85% 50%;
+
+    /* Game colors dark mode */
+    --game-snake: 142 76% 50%;
+    --game-snake-glow: 142 76% 60%;
+    --game-food: 350 89% 65%;
+    --game-board: 220 20% 6%;
+    --game-grid: 220 20% 12%;
   }
+}
+
+/* Game animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px hsl(var(--game-food)), 0 0 16px hsl(var(--game-food) / 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px hsl(var(--game-food)), 0 0 32px hsl(var(--game-food) / 0.7);
+    transform: scale(1.1);
+  }
+}
+
+@keyframes snake-glow {
+  0%, 100% {
+    box-shadow: 0 0 6px hsl(var(--game-snake-glow));
+  }
+  50% {
+    box-shadow: 0 0 12px hsl(var(--game-snake-glow)), 0 0 20px hsl(var(--game-snake-glow) / 0.5);
+  }
+}
+
+@keyframes cell-reveal {
+  0% {
+    transform: scale(0.8) rotateX(90deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes reaction-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes score-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.animate-snake-glow {
+  animation: snake-glow 2s ease-in-out infinite;
+}
+
+.animate-cell-reveal {
+  animation: cell-reveal 0.2s ease-out forwards;
+}
+
+.animate-reaction-pulse {
+  animation: reaction-pulse 1s ease-in-out infinite;
+}
+
+.animate-score-pop {
+  animation: score-pop 0.3s ease-out;
 }
 
 @layer base {

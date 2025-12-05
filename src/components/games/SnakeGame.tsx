@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Play, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const GRID_SIZE = 20;
-const CELL_SIZE = 20;
+const CELL_SIZE = 18;
 const INITIAL_SPEED = 150;
 
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
@@ -22,6 +23,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [scoreAnimating, setScoreAnimating] = useState(false);
   const [highScore, setHighScore] = useState(() => {
     const saved = localStorage.getItem("snakeHighScore");
     return saved ? parseInt(saved) : 0;
@@ -55,7 +57,6 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
       localStorage.setItem("snakeHighScore", finalScore.toString());
     }
     
-    // Submit score to leaderboard if > 0
     if (finalScore > 0 && onScoreSubmit) {
       const success = await onScoreSubmit(finalScore);
       if (success) {
@@ -87,13 +88,11 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
         case "RIGHT": head.x += 1; break;
       }
 
-      // Check wall collision
       if (head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE) {
         handleGameOver(scoreRef.current);
         return prevSnake;
       }
 
-      // Check self collision
       if (prevSnake.some(seg => seg.x === head.x && seg.y === head.y)) {
         handleGameOver(scoreRef.current);
         return prevSnake;
@@ -101,12 +100,13 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
 
       const newSnake = [head, ...prevSnake];
 
-      // Check food collision
       if (head.x === food.x && head.y === food.y) {
         setScore(prev => {
           const newScore = prev + 10;
           return newScore;
         });
+        setScoreAnimating(true);
+        setTimeout(() => setScoreAnimating(false), 300);
         setFood(generateFood(newSnake));
       } else {
         newSnake.pop();
@@ -165,11 +165,21 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPlaying]);
 
+  const getSegmentStyle = (index: number, total: number) => {
+    const opacity = Math.max(0.4, 1 - (index / total) * 0.6);
+    const hue = 142 + (index * 2);
+    return {
+      background: `linear-gradient(135deg, hsl(${hue}, 76%, ${50 - index * 2}%), hsl(${hue}, 76%, ${40 - index}%))`,
+      opacity,
+      boxShadow: index === 0 ? '0 0 12px hsl(142, 76%, 50%), 0 0 24px hsl(142, 76%, 50% / 0.3)' : 'none',
+    };
+  };
+
   return (
     <div>
-      <Card className="mb-6">
+      <Card className="mb-6 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-emerald-500/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-emerald-400">
             🐍 Snake
           </CardTitle>
         </CardHeader>
@@ -181,50 +191,89 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
       </Card>
 
       <div className="flex flex-col items-center gap-4">
-        <div className="flex gap-4 mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Score:</span>
-            <span className="font-bold text-xl">{score}</span>
+        <div className="flex gap-6 mb-2">
+          <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-full border border-border">
+            <span className="text-muted-foreground text-sm">Score</span>
+            <span className={cn(
+              "font-bold text-2xl text-emerald-400 transition-transform",
+              scoreAnimating && "animate-score-pop"
+            )}>
+              {score}
+            </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4 text-yellow-500" />
-            <span className="font-bold text-xl">{highScore}</span>
+          <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-full border border-amber-500/30">
+            <Trophy className="h-5 w-5 text-amber-400" />
+            <span className="font-bold text-2xl text-amber-400">{highScore}</span>
           </div>
         </div>
 
         <div 
-          className="relative border-2 border-border rounded-lg overflow-hidden bg-muted/50"
-          style={{ width: GRID_SIZE * CELL_SIZE, height: GRID_SIZE * CELL_SIZE }}
+          className="relative rounded-xl overflow-hidden"
+          style={{ 
+            width: GRID_SIZE * CELL_SIZE + 4, 
+            height: GRID_SIZE * CELL_SIZE + 4,
+            background: 'linear-gradient(135deg, hsl(220, 20%, 8%), hsl(220, 25%, 12%))',
+            boxShadow: '0 0 40px hsl(142, 76%, 50% / 0.1), inset 0 0 60px hsl(220, 25%, 5%)',
+            border: '2px solid hsl(220, 25%, 20%)',
+          }}
         >
-          {snake.map((segment, i) => (
-            <div
-              key={i}
-              className="absolute bg-green-500 rounded-sm"
-              style={{
-                width: CELL_SIZE - 2,
-                height: CELL_SIZE - 2,
-                left: segment.x * CELL_SIZE + 1,
-                top: segment.y * CELL_SIZE + 1,
-                opacity: i === 0 ? 1 : 0.8,
-              }}
-            />
-          ))}
-          <div
-            className="absolute bg-red-500 rounded-full"
+          {/* Grid pattern */}
+          <div 
+            className="absolute inset-0 opacity-20"
             style={{
-              width: CELL_SIZE - 4,
-              height: CELL_SIZE - 4,
-              left: food.x * CELL_SIZE + 2,
-              top: food.y * CELL_SIZE + 2,
+              backgroundImage: `
+                linear-gradient(hsl(220, 25%, 25%) 1px, transparent 1px),
+                linear-gradient(90deg, hsl(220, 25%, 25%) 1px, transparent 1px)
+              `,
+              backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`,
             }}
           />
           
+          {/* Snake */}
+          {snake.map((segment, i) => (
+            <div
+              key={i}
+              className={cn(
+                "absolute rounded-md transition-all duration-75",
+                i === 0 && "animate-snake-glow"
+              )}
+              style={{
+                width: CELL_SIZE - 3,
+                height: CELL_SIZE - 3,
+                left: segment.x * CELL_SIZE + 3.5,
+                top: segment.y * CELL_SIZE + 3.5,
+                ...getSegmentStyle(i, snake.length),
+              }}
+            />
+          ))}
+          
+          {/* Food */}
+          <div
+            className="absolute rounded-full animate-pulse-glow"
+            style={{
+              width: CELL_SIZE - 4,
+              height: CELL_SIZE - 4,
+              left: food.x * CELL_SIZE + 4,
+              top: food.y * CELL_SIZE + 4,
+              background: 'radial-gradient(circle at 30% 30%, hsl(350, 89%, 70%), hsl(350, 89%, 50%))',
+            }}
+          />
+          
+          {/* Overlay */}
           {!isPlaying && (
-            <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
+            <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center">
               <div className="text-center">
-                {gameOver && <p className="text-xl font-bold text-destructive mb-2">Game Over!</p>}
-                <Button onClick={resetGame}>
-                  {gameOver ? <RotateCcw className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
+                {gameOver && (
+                  <p className="text-2xl font-bold text-red-400 mb-4 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
+                    Game Over!
+                  </p>
+                )}
+                <Button 
+                  onClick={resetGame}
+                  size="lg"
+                  className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 shadow-lg shadow-emerald-500/25"
+                >
+                  {gameOver ? <RotateCcw className="h-5 w-5 mr-2" /> : <Play className="h-5 w-5 mr-2" />}
                   {gameOver ? "Play Again" : "Start Game"}
                 </Button>
               </div>
@@ -238,6 +287,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
+            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
             onClick={() => { if (directionRef.current !== "DOWN") { directionRef.current = "UP"; setDirection("UP"); }}}
           >
             ↑
@@ -246,6 +296,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
+            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
             onClick={() => { if (directionRef.current !== "RIGHT") { directionRef.current = "LEFT"; setDirection("LEFT"); }}}
           >
             ←
@@ -253,6 +304,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
+            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
             onClick={() => { if (directionRef.current !== "UP") { directionRef.current = "DOWN"; setDirection("DOWN"); }}}
           >
             ↓
@@ -260,6 +312,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
+            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
             onClick={() => { if (directionRef.current !== "LEFT") { directionRef.current = "RIGHT"; setDirection("RIGHT"); }}}
           >
             →
