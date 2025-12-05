@@ -7,8 +7,9 @@ import ChatInput from "@/components/ChatInput";
 import ConversationsList from "@/components/ConversationsList";
 import NewConversationDialog from "@/components/NewConversationDialog";
 import AddMembersDialog from "@/components/AddMembersDialog";
+import { UpdatesDialog } from "@/components/UpdatesDialog";
 import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle, Plus, UserPlus, Gamepad2, Bot } from "lucide-react";
+import { LogOut, MessageCircle, Plus, UserPlus, Gamepad2, Bot, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { usePresence } from "@/hooks/usePresence";
@@ -300,6 +301,14 @@ const Index = () => {
                     AI
                   </Link>
                 </Button>
+                {currentProfile.display_name.toLowerCase() === "mike" && (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/admin">
+                      <Megaphone className="h-4 w-4 mr-2" />
+                      Updates
+                    </Link>
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
@@ -369,6 +378,8 @@ const Index = () => {
           onAddMembers={handleAddMembers}
         />
       )}
+
+      <UpdatesDialog />
     </>
   );
 };
