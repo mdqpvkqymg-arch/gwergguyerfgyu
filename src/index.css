@@ -62,6 +62,14 @@ All colors MUST be HSL.
     --game-success: 142 76% 45%;
     --game-danger: 0 72% 51%;
     --game-warning: 45 93% 58%;
+    --game-pacman: 45 100% 50%;
+    --game-tetris-i: 180 80% 50%;
+    --game-tetris-o: 45 80% 50%;
+    --game-tetris-t: 280 80% 50%;
+    --game-tetris-s: 120 80% 45%;
+    --game-tetris-z: 0 80% 50%;
+    --game-tetris-j: 220 80% 50%;
+    --game-tetris-l: 30 80% 50%;
   }
 
   .dark {
