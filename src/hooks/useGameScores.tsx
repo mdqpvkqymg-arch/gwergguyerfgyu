@@ -1,0 +1,108 @@
+import { useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+type GameType = "snake" | "minesweeper" | "reaction";
+
+interface GameScore {
+  id: string;
+  profile_id: string;
+  game_type: GameType;
+  score: number;
+  created_at: string;
+  profiles?: {
+    display_name: string;
+    avatar_color: string;
+  };
+}
+
+export const useGameScores = (currentProfileId: string | null) => {
+  const [scores, setScores] = useState<Record<GameType, GameScore[]>>({
+    snake: [],
+    minesweeper: [],
+    reaction: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  const fetchScores = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("game_scores")
+      .select(`
+        *,
+        profiles(display_name, avatar_color)
+      `)
+      .order("score", { ascending: false })
+      .limit(100);
+
+    if (error) {
+      console.error("Error fetching scores:", error);
+      return;
+    }
+
+    const grouped: Record<GameType, GameScore[]> = {
+      snake: [],
+      minesweeper: [],
+      reaction: [],
+    };
+
+    (data || []).forEach((score: any) => {
+      const gameType = score.game_type as GameType;
+      if (grouped[gameType]) {
+        // For reaction, lower is better, so we'll handle sorting differently
+        grouped[gameType].push(score);
+      }
+    });
+
+    // Sort reaction scores ascending (lower is better)
+    grouped.reaction.sort((a, b) => a.score - b.score);
+    // Keep only top 10 for each game
+    grouped.snake = grouped.snake.slice(0, 10);
+    grouped.minesweeper = grouped.minesweeper.slice(0, 10);
+    grouped.reaction = grouped.reaction.slice(0, 10);
+
+    setScores(grouped);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchScores();
+
+    // Subscribe to realtime updates
+    const channel = supabase
+      .channel("game_scores_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "game_scores",
+        },
+        () => {
+          fetchScores();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchScores]);
+
+  const submitScore = useCallback(async (gameType: GameType, score: number) => {
+    if (!currentProfileId) return false;
+
+    const { error } = await supabase.from("game_scores").insert({
+      profile_id: currentProfileId,
+      game_type: gameType,
+      score,
+    });
+
+    if (error) {
+      console.error("Error submitting score:", error);
+      return false;
+    }
+
+    return true;
+  }, [currentProfileId]);
+
+  return { scores, loading, submitScore, refetch: fetchScores };
+};
