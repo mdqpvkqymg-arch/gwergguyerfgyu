@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import ChatMessage from "@/components/ChatMessage";
@@ -8,7 +8,7 @@ import ConversationsList from "@/components/ConversationsList";
 import NewConversationDialog from "@/components/NewConversationDialog";
 import AddMembersDialog from "@/components/AddMembersDialog";
 import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle, Plus, UserPlus } from "lucide-react";
+import { LogOut, MessageCircle, Plus, UserPlus, Gamepad2 } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { usePresence } from "@/hooks/usePresence";
@@ -287,6 +287,12 @@ const Index = () => {
                 <Button variant="outline" size="sm" onClick={() => setNewConversationOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   New Chat
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/game">
+                    <Gamepad2 className="h-4 w-4 mr-2" />
+                    Game
+                  </Link>
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
