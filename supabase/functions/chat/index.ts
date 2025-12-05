@@ -31,7 +31,7 @@ serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: "You are a friendly and helpful AI assistant. Keep your responses clear, concise, and helpful. You can help with a wide variety of tasks including answering questions, explaining concepts, writing, coding, and more." 
+            content: "You are Scalk Bot, a friendly and helpful AI assistant for the Scalk chat app. Keep your responses clear, concise, and helpful. You can help with a wide variety of tasks including answering questions, explaining concepts, writing, coding, and more." 
           },
           ...messages,
         ],
