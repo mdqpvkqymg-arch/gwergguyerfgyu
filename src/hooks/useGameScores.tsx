@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type GameType = "snake" | "minesweeper" | "reaction";
+type GameType = "snake" | "minesweeper" | "reaction" | "tetris" | "pacman" | "bounce" | "puzzle" | "spider" | "defender";
 
 interface GameScore {
   id: string;
@@ -20,6 +20,12 @@ export const useGameScores = (currentProfileId: string | null) => {
     snake: [],
     minesweeper: [],
     reaction: [],
+    tetris: [],
+    pacman: [],
+    bounce: [],
+    puzzle: [],
+    spider: [],
+    defender: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -42,6 +48,12 @@ export const useGameScores = (currentProfileId: string | null) => {
       snake: [],
       minesweeper: [],
       reaction: [],
+      tetris: [],
+      pacman: [],
+      bounce: [],
+      puzzle: [],
+      spider: [],
+      defender: [],
     };
 
     (data || []).forEach((score: any) => {
@@ -55,9 +67,9 @@ export const useGameScores = (currentProfileId: string | null) => {
     // Sort reaction scores ascending (lower is better)
     grouped.reaction.sort((a, b) => a.score - b.score);
     // Keep only top 10 for each game
-    grouped.snake = grouped.snake.slice(0, 10);
-    grouped.minesweeper = grouped.minesweeper.slice(0, 10);
-    grouped.reaction = grouped.reaction.slice(0, 10);
+    Object.keys(grouped).forEach(key => {
+      grouped[key as GameType] = grouped[key as GameType].slice(0, 10);
+    });
 
     setScores(grouped);
     setLoading(false);

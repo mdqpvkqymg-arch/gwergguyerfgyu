@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Zap, Bomb, Medal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type GameType = "snake" | "minesweeper" | "reaction";
+type GameType = "snake" | "minesweeper" | "reaction" | "tetris" | "pacman" | "bounce" | "puzzle" | "spider" | "defender";
 
 interface GameScore {
   id: string;
@@ -35,12 +35,10 @@ const getMedalColor = (rank: number) => {
 
 const ScoreList = ({ 
   scores, 
-  gameType, 
   currentProfileId,
   formatScore 
 }: { 
   scores: GameScore[]; 
-  gameType: GameType;
   currentProfileId: string | null;
   formatScore: (score: number) => string;
 }) => {
@@ -95,6 +93,18 @@ const ScoreList = ({
   );
 };
 
+const GAME_TABS: { key: GameType; label: string; icon: string; format: (s: number) => string }[] = [
+  { key: "snake", label: "Snake", icon: "🐍", format: (s) => `${s} pts` },
+  { key: "tetris", label: "Tetris", icon: "🎮", format: (s) => `${s} pts` },
+  { key: "pacman", label: "Pacman", icon: "👻", format: (s) => `${s} pts` },
+  { key: "bounce", label: "Bounce", icon: "🏓", format: (s) => `${s} pts` },
+  { key: "minesweeper", label: "Mines", icon: "💣", format: (s) => `${s} wins` },
+  { key: "puzzle", label: "Puzzle", icon: "🧩", format: (s) => `${s} pts` },
+  { key: "spider", label: "Spider", icon: "🕷️", format: (s) => `${s} pts` },
+  { key: "defender", label: "Defender", icon: "🚀", format: (s) => `${s} pts` },
+  { key: "reaction", label: "Reaction", icon: "⚡", format: (s) => `${s}ms` },
+];
+
 const Leaderboard = ({ scores, loading, currentProfileId }: LeaderboardProps) => {
   if (loading) {
     return (
@@ -116,46 +126,23 @@ const Leaderboard = ({ scores, loading, currentProfileId }: LeaderboardProps) =>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="snake" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="snake" className="text-xs sm:text-sm">
-              🐍 Snake
-            </TabsTrigger>
-            <TabsTrigger value="minesweeper" className="text-xs sm:text-sm">
-              <Bomb className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              Mines
-            </TabsTrigger>
-            <TabsTrigger value="reaction" className="text-xs sm:text-sm">
-              <Zap className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-              Reaction
-            </TabsTrigger>
+          <TabsList className="flex flex-wrap gap-1 h-auto p-2 mb-4">
+            {GAME_TABS.map(tab => (
+              <TabsTrigger key={tab.key} value={tab.key} className="text-xs">
+                {tab.icon} {tab.label}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
-          <TabsContent value="snake">
-            <ScoreList 
-              scores={scores.snake} 
-              gameType="snake" 
-              currentProfileId={currentProfileId}
-              formatScore={(s) => `${s} pts`}
-            />
-          </TabsContent>
-
-          <TabsContent value="minesweeper">
-            <ScoreList 
-              scores={scores.minesweeper} 
-              gameType="minesweeper" 
-              currentProfileId={currentProfileId}
-              formatScore={(s) => `${s} wins`}
-            />
-          </TabsContent>
-
-          <TabsContent value="reaction">
-            <ScoreList 
-              scores={scores.reaction} 
-              gameType="reaction" 
-              currentProfileId={currentProfileId}
-              formatScore={(s) => `${s}ms`}
-            />
-          </TabsContent>
+          {GAME_TABS.map(tab => (
+            <TabsContent key={tab.key} value={tab.key}>
+              <ScoreList 
+                scores={scores[tab.key]} 
+                currentProfileId={currentProfileId}
+                formatScore={tab.format}
+              />
+            </TabsContent>
+          ))}
         </Tabs>
       </CardContent>
     </Card>
