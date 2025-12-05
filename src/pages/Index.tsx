@@ -47,7 +47,7 @@ const Index = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
-  const { conversations, createConversation, addMembers } = useConversations(currentProfile?.id || null);
+  const { conversations, createConversation, addMembers, deleteConversation } = useConversations(currentProfile?.id || null);
   const onlineUserIds = usePresence(
     currentProfile?.id || null,
     currentProfile?.display_name || "",
@@ -249,6 +249,13 @@ const Index = () => {
           currentProfileId={currentProfile.id}
           selectedConversationId={selectedConversationId}
           onSelectConversation={setSelectedConversationId}
+          onDeleteConversation={async (id) => {
+            const success = await deleteConversation(id);
+            if (success && selectedConversationId === id) {
+              setSelectedConversationId("");
+            }
+            return success;
+          }}
           unreadCounts={unreadCounts}
         />
 
