@@ -47,7 +47,14 @@ export const useConversations = (currentProfileId: string | null) => {
         members: conv.conversation_members,
       }));
 
-      setConversations(mappedData);
+      // Sort to put "updates" conversation at the top
+      const sortedData = mappedData.sort((a: Conversation, b: Conversation) => {
+        if (a.name === "updates") return -1;
+        if (b.name === "updates") return 1;
+        return 0;
+      });
+
+      setConversations(sortedData);
       setLoading(false);
     };
 
