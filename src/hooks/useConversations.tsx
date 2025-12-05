@@ -116,5 +116,23 @@ export const useConversations = (currentProfileId: string | null) => {
     }
   };
 
-  return { conversations, loading, createConversation, addMembers };
+  const deleteConversation = async (conversationId: string) => {
+    try {
+      const { error } = await supabase
+        .from("conversations")
+        .delete()
+        .eq("id", conversationId);
+
+      if (error) throw error;
+
+      toast.success("Conversation deleted");
+      return true;
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      toast.error("Failed to delete conversation");
+      return false;
+    }
+  };
+
+  return { conversations, loading, createConversation, addMembers, deleteConversation };
 };
