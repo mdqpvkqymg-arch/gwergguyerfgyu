@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import ChatMessage from "@/components/ChatMessage";
@@ -8,8 +8,8 @@ import ConversationsList from "@/components/ConversationsList";
 import NewConversationDialog from "@/components/NewConversationDialog";
 import AddMembersDialog from "@/components/AddMembersDialog";
 import { UpdatesDialog } from "@/components/UpdatesDialog";
-import { Button } from "@/components/ui/button";
-import { LogOut, MessageCircle, Plus, UserPlus, Gamepad2, Bot, Megaphone } from "lucide-react";
+import { MainHeader } from "@/components/MainHeader";
+import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
 import { usePresence } from "@/hooks/usePresence";
@@ -267,55 +267,14 @@ const Index = () => {
         />
 
         <div className="flex-1 flex flex-col">
-          <header className="bg-card border-b border-border px-6 py-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shadow-md">
-                  <MessageCircle className="h-6 w-6 text-primary-foreground" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground">Scalk</h1>
-                  <p className="text-sm text-muted-foreground">Real-time Chat</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {selectedConversation?.is_group && (
-                  <Button variant="outline" size="sm" onClick={() => setAddMembersOpen(true)}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Add Members
-                  </Button>
-                )}
-                <Button variant="outline" size="sm" onClick={() => setNewConversationOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Chat
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/game">
-                    <Gamepad2 className="h-4 w-4 mr-2" />
-                    Game
-                  </Link>
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/ai">
-                    <Bot className="h-4 w-4 mr-2" />
-                    AI
-                  </Link>
-                </Button>
-                {currentProfile.display_name.toLowerCase() === "mike" && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to="/admin">
-                      <Megaphone className="h-4 w-4 mr-2" />
-                      Updates
-                    </Link>
-                  </Button>
-                )}
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            </div>
-          </header>
+          <MainHeader
+            currentProfileName={currentProfile.display_name}
+            avatarColor={currentProfile.avatar_color}
+            showAddMembers={!!selectedConversation?.is_group}
+            onAddMembersClick={() => setAddMembersOpen(true)}
+            onNewChatClick={() => setNewConversationOpen(true)}
+            onLogout={handleLogout}
+          />
 
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
             {!selectedConversationId ? (
