@@ -265,7 +265,12 @@ const Index = () => {
 
   return (
     <>
-      <div className="flex h-screen bg-background">
+      <div className="flex h-screen home-gradient relative overflow-hidden">
+        {/* Background orbs */}
+        <div className="orb w-96 h-96 bg-cyan-300/30 top-[-10%] left-[-10%] pointer-events-none" style={{ animationDelay: "0s" }} />
+        <div className="orb w-80 h-80 bg-teal-400/30 top-[50%] right-[-5%] pointer-events-none" style={{ animationDelay: "5s" }} />
+        <div className="orb w-64 h-64 bg-blue-400/30 bottom-[-10%] left-[30%] pointer-events-none" style={{ animationDelay: "10s" }} />
+
         <ConversationsList
           conversations={conversations}
           currentProfileId={currentProfile.id}
@@ -275,7 +280,7 @@ const Index = () => {
           unreadCounts={unreadCounts}
         />
 
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative z-10">
           <MainHeader
             currentProfileName={currentProfile.display_name}
             avatarColor={currentProfile.avatar_color}
@@ -287,11 +292,13 @@ const Index = () => {
 
           <div className="flex-1 overflow-y-auto overflow-x-hidden p-6">
             {!selectedConversationId ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <div className="text-center">
-                  <MessageCircle className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">Select a conversation</p>
-                  <p className="text-sm mt-2">Choose a conversation or start a new one</p>
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/20 flex items-center justify-center">
+                    <MessageCircle className="h-10 w-10 text-white/70" />
+                  </div>
+                  <p className="text-lg font-medium text-white">Select a conversation</p>
+                  <p className="text-sm mt-2 text-white/60">Choose a conversation or start a new one</p>
                 </div>
               </div>
             ) : (

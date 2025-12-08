@@ -89,9 +89,9 @@ const ConversationsList = ({
   };
 
   return (
-    <div className="w-80 bg-sidebar border-r border-sidebar-border flex flex-col">
-      <div className="p-4 border-b border-sidebar-border">
-        <h3 className="text-sm font-semibold text-sidebar-foreground uppercase tracking-wide">
+    <div className="w-80 backdrop-blur-xl bg-white/10 border-r border-white/20 flex flex-col relative z-10">
+      <div className="p-4 border-b border-white/20">
+        <h3 className="text-sm font-semibold text-white/90 uppercase tracking-wide">
           Conversations
         </h3>
       </div>
@@ -105,12 +105,12 @@ const ConversationsList = ({
                 <div
                   onClick={() => onSelectConversation(conv.id)}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200",
-                    "hover:bg-sidebar-accent",
-                    selectedConversationId === conv.id && "bg-sidebar-accent"
+                    "flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-300",
+                    "hover:bg-white/15",
+                    selectedConversationId === conv.id && "bg-white/20 shadow-lg"
                   )}
                 >
-                  <Avatar className="h-10 w-10">
+                  <Avatar className="h-10 w-10 ring-2 ring-white/20">
                     <AvatarFallback className={cn("text-sm font-semibold text-white", display.color)}>
                       {display.avatarText}
                     </AvatarFallback>
@@ -118,19 +118,19 @@ const ConversationsList = ({
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium text-sidebar-foreground truncate">
+                      <p className="text-sm font-medium text-white truncate">
                         {display.name}
                       </p>
-                      {conv.is_group && <Users className="h-3 w-3 text-muted-foreground" />}
+                      {conv.is_group && <Users className="h-3 w-3 text-white/50" />}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-white/50">
                       {conv.members.length} member{conv.members.length !== 1 ? "s" : ""}
                     </p>
                   </div>
 
                   {unreadCounts[conv.id] > 0 && (
-                    <div className="flex-shrink-0 min-w-5 h-5 px-1.5 bg-primary rounded-full flex items-center justify-center">
-                      <span className="text-xs font-semibold text-primary-foreground">
+                    <div className="flex-shrink-0 min-w-5 h-5 px-1.5 bg-emerald-400 rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-xs font-semibold text-white">
                         {unreadCounts[conv.id] > 99 ? "99+" : unreadCounts[conv.id]}
                       </span>
                     </div>
@@ -138,7 +138,7 @@ const ConversationsList = ({
                 </div>
               </ContextMenuTrigger>
               {!conv.is_group && (
-                <ContextMenuContent>
+                <ContextMenuContent className="backdrop-blur-xl bg-white/90">
                   <ContextMenuItem
                     onClick={() => handleDeleteClick(conv.id)}
                     className="text-destructive focus:text-destructive"
@@ -153,16 +153,18 @@ const ConversationsList = ({
         })}
 
         {conversations.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">No conversations yet</p>
-            <p className="text-xs mt-1">Start a new conversation to get started</p>
+          <div className="text-center py-12">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-white/10 flex items-center justify-center">
+              <MessageCircle className="h-8 w-8 text-white/50" />
+            </div>
+            <p className="text-sm text-white/70">No conversations yet</p>
+            <p className="text-xs mt-1 text-white/50">Start a new conversation to get started</p>
           </div>
         )}
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="backdrop-blur-xl bg-white/95">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete conversation?</AlertDialogTitle>
             <AlertDialogDescription>

@@ -86,18 +86,18 @@ const ChatInput = ({ onSendMessage, onTyping, onStopTyping }: ChatInputProps) =>
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 p-4 bg-card border-t border-border">
+    <form onSubmit={handleSubmit} className="flex gap-3 p-4 backdrop-blur-xl bg-white/10 border-t border-white/20">
       <Input
         value={message}
         onChange={handleChange}
         placeholder="Type your message..."
-        className="flex-1 bg-background border-input focus-visible:ring-primary"
+        className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30 focus-visible:border-white/30"
         maxLength={SPAM_CONFIG.maxMessageLength}
       />
       <Button 
         type="submit" 
         size="icon"
-        className="bg-primary hover:bg-primary/90 transition-all duration-200"
+        className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white shadow-lg transition-all duration-300 hover:scale-105"
         disabled={!message.trim() || isCooldown}
       >
         <Send className="h-4 w-4" />

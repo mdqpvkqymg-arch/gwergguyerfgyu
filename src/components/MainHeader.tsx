@@ -16,7 +16,7 @@ import {
   Megaphone,
   LogOut,
   Menu,
-  Sparkles,
+  Home,
   Zap,
 } from "lucide-react";
 
@@ -40,33 +40,43 @@ export const MainHeader = ({
   const isAdmin = currentProfileName.toLowerCase() === "mike";
 
   return (
-    <header className="bg-gradient-to-r from-card via-card to-card/95 border-b border-border px-4 md:px-6 py-3 shadow-lg backdrop-blur-sm">
+    <header className="backdrop-blur-xl bg-white/10 border-b border-white/20 px-4 md:px-6 py-3 shadow-lg">
       <div className="flex items-center justify-between">
         {/* Logo Section */}
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="h-11 w-11 bg-gradient-to-br from-primary via-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-primary/20">
-              <MessageCircle className="h-6 w-6 text-primary-foreground" />
+          <Link to="/" className="relative group">
+            <div className="h-11 w-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-lg border border-white/30 transition-all duration-300 group-hover:bg-white/30 group-hover:scale-105">
+              <MessageCircle className="h-6 w-6 text-white" />
             </div>
-            <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-card animate-pulse" />
-          </div>
+            <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full border-2 border-white/30 animate-pulse" />
+          </Link>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent flex items-center gap-2">
+            <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
               Scalk
-              <Sparkles className="h-4 w-4 text-primary hidden md:inline" />
             </h1>
-            <p className="text-xs text-muted-foreground hidden sm:block">Real-time Chat</p>
+            <p className="text-xs text-white/60 hidden sm:block">Real-time Chat</p>
           </div>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
+          >
+            <Link to="/" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              <span>Home</span>
+            </Link>
+          </Button>
           {showAddMembers && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onAddMembersClick}
-              className="hover:bg-primary/10 hover:text-primary transition-all duration-200"
+              className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               <UserPlus className="h-4 w-4 mr-2" />
               Add Members
@@ -76,20 +86,20 @@ export const MainHeader = ({
             variant="ghost"
             size="sm"
             onClick={onNewChatClick}
-            className="hover:bg-primary/10 hover:text-primary transition-all duration-200"
+            className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
           >
             <Plus className="h-4 w-4 mr-2" />
             New Chat
           </Button>
-          <div className="h-6 w-px bg-border mx-1" />
+          <div className="h-6 w-px bg-white/20 mx-1" />
           <Button
             variant="ghost"
             size="sm"
             asChild
-            className="hover:bg-accent/80 transition-all duration-200"
+            className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
           >
             <Link to="/game" className="flex items-center gap-2">
-              <Gamepad2 className="h-4 w-4 text-orange-500" />
+              <Gamepad2 className="h-4 w-4 text-emerald-300" />
               <span>Games</span>
             </Link>
           </Button>
@@ -97,10 +107,10 @@ export const MainHeader = ({
             variant="ghost"
             size="sm"
             asChild
-            className="hover:bg-accent/80 transition-all duration-200"
+            className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
           >
             <Link to="/ai" className="flex items-center gap-2">
-              <Bot className="h-4 w-4 text-violet-500" />
+              <Bot className="h-4 w-4 text-purple-300" />
               <span>AI</span>
             </Link>
           </Button>
@@ -109,37 +119,39 @@ export const MainHeader = ({
               variant="ghost"
               size="sm"
               asChild
-              className="hover:bg-accent/80 transition-all duration-200"
+              className="text-white/80 hover:text-white hover:bg-white/10 transition-all duration-200"
             >
               <Link to="/admin" className="flex items-center gap-2">
-                <Megaphone className="h-4 w-4 text-emerald-500" />
+                <Megaphone className="h-4 w-4 text-rose-300" />
                 <span>Admin</span>
               </Link>
             </Button>
           )}
-          <div className="h-6 w-px bg-border mx-1" />
+          <div className="h-6 w-px bg-white/20 mx-1" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="gap-2 hover:bg-muted/80 pl-2 pr-3"
+                className="gap-2 text-white hover:bg-white/10 pl-2 pr-3"
               >
                 <div
-                  className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-inner"
+                  className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-inner ring-2 ring-white/20"
                   style={{ backgroundColor: avatarColor }}
                 >
                   {currentProfileName.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden xl:inline max-w-[100px] truncate">
+                <span className="hidden xl:inline max-w-[100px] truncate text-white/90">
                   {currentProfileName}
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 backdrop-blur-xl bg-white/90 border-white/30">
               <div className="px-2 py-1.5">
                 <p className="text-sm font-medium">{currentProfileName}</p>
-                <p className="text-xs text-muted-foreground">Online</p>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Zap className="h-3 w-3 text-emerald-500" /> Online
+                </p>
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onLogout} className="text-destructive focus:text-destructive">
@@ -156,17 +168,17 @@ export const MainHeader = ({
             variant="ghost"
             size="icon"
             onClick={onNewChatClick}
-            className="h-9 w-9"
+            className="h-9 w-9 text-white hover:bg-white/10"
           >
             <Plus className="h-5 w-5" />
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9">
+              <Button variant="ghost" size="icon" className="h-9 w-9 text-white hover:bg-white/10">
                 <Menu className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-56 backdrop-blur-xl bg-white/90 border-white/30">
               <div className="px-2 py-2 flex items-center gap-2">
                 <div
                   className="h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
@@ -177,11 +189,17 @@ export const MainHeader = ({
                 <div>
                   <p className="text-sm font-medium">{currentProfileName}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Zap className="h-3 w-3 text-green-500" /> Online
+                    <Zap className="h-3 w-3 text-emerald-500" /> Online
                   </p>
                 </div>
               </div>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/" className="flex items-center">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </Link>
+              </DropdownMenuItem>
               {showAddMembers && (
                 <DropdownMenuItem onClick={onAddMembersClick}>
                   <UserPlus className="h-4 w-4 mr-2" />
@@ -195,20 +213,20 @@ export const MainHeader = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/game" className="flex items-center">
-                  <Gamepad2 className="h-4 w-4 mr-2 text-orange-500" />
+                  <Gamepad2 className="h-4 w-4 mr-2 text-emerald-500" />
                   Games
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/ai" className="flex items-center">
-                  <Bot className="h-4 w-4 mr-2 text-violet-500" />
+                  <Bot className="h-4 w-4 mr-2 text-purple-500" />
                   AI Assistant
                 </Link>
               </DropdownMenuItem>
               {isAdmin && (
                 <DropdownMenuItem asChild>
                   <Link to="/admin" className="flex items-center">
-                    <Megaphone className="h-4 w-4 mr-2 text-emerald-500" />
+                    <Megaphone className="h-4 w-4 mr-2 text-rose-500" />
                     Admin Panel
                   </Link>
                 </DropdownMenuItem>
