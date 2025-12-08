@@ -79,10 +79,11 @@ const Game = () => {
           <TabsContent value="reaction"><ReactionGame onScoreSubmit={(score) => submitScore("reaction", score)} /></TabsContent>
           <TabsContent value="golforbit">
             <ExternalGameEmbed
-              src="https://thepizzaedition.com/assets/mainstorage/golforbit.html"
+              src="https://pizzaedition.win/assets/mainstorage/golforbit.html"
               title="Golf Orbit"
-              developer="Creator Name Soon"
-              description="Golf Orbit is an arcade-style golf game that focuses on hitting the ball as far as possible rather than playing on traditional courses."
+              developer="Creator"
+              description="Golf Orbit is an arcade-style golf game that focuses on hitting the ball as far as possible rather than playing on traditional courses. Each swing sends the ball soaring over landscapes, earning money based on distance and collectibles picked up mid-flight."
+              thumbnail="https://pizzaedition.win/images/games/golforbit-min.jpg"
             />
           </TabsContent>
           <TabsContent value="leaderboard"><Leaderboard scores={scores} loading={loading} currentProfileId={currentProfileId} /></TabsContent>
