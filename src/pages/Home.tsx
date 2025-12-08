@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, Gamepad2, Bot, Shield } from "lucide-react";
+import { MessageCircle, Gamepad2, Bot, Shield, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,21 +8,21 @@ const apps = [
     name: "Chat",
     icon: MessageCircle,
     path: "/chat",
-    color: "hsl(var(--primary))",
+    gradient: "from-cyan-400 to-blue-500",
     description: "Message your friends",
   },
   {
     name: "Games",
     icon: Gamepad2,
     path: "/game",
-    color: "hsl(var(--game-snake))",
+    gradient: "from-emerald-400 to-teal-500",
     description: "Play & compete",
   },
   {
     name: "AI Bot",
     icon: Bot,
     path: "/ai",
-    color: "hsl(var(--accent))",
+    gradient: "from-purple-400 to-indigo-500",
     description: "Chat with Scalk Bot",
   },
 ];
@@ -30,10 +30,13 @@ const apps = [
 const Home = () => {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const checkAdmin = async () => {
+    const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
       if (user) {
         const { data } = await supabase.rpc("has_role", {
           _role: "admin",
@@ -41,9 +44,15 @@ const Home = () => {
         });
         setIsAdmin(!!data);
       }
+      setTimeout(() => setLoaded(true), 100);
     };
-    checkAdmin();
+    checkAuth();
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
 
   const allApps = isAdmin
     ? [
@@ -52,39 +61,86 @@ const Home = () => {
           name: "Admin",
           icon: Shield,
           path: "/admin",
-          color: "hsl(var(--destructive))",
+          gradient: "from-rose-400 to-red-500",
           description: "Manage Scalk",
         },
       ]
     : apps;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
-      <h1 className="text-4xl font-bold text-foreground mb-2">Scalk</h1>
-      <p className="text-muted-foreground mb-12">Choose an app</p>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl">
-        {allApps.map((app) => (
+    <div className="min-h-screen home-gradient relative overflow-hidden">
+      {/* Floating orbs for atmosphere */}
+      <div className="orb w-96 h-96 bg-cyan-300 top-[-10%] left-[-10%]" style={{ animationDelay: "0s" }} />
+      <div className="orb w-80 h-80 bg-teal-400 top-[50%] right-[-5%]" style={{ animationDelay: "5s" }} />
+      <div className="orb w-64 h-64 bg-blue-400 bottom-[-10%] left-[30%]" style={{ animationDelay: "10s" }} />
+      
+      {/* User controls */}
+      {user && (
+        <div className="absolute top-6 right-6 z-20">
           <button
-            key={app.name}
-            onClick={() => navigate(app.path)}
-            className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-200 group"
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white/90 hover:bg-white/20 transition-all duration-300"
           >
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110"
-              style={{ backgroundColor: `${app.color}20` }}
-            >
-              <app.icon
-                className="w-8 h-8"
-                style={{ color: app.color }}
-              />
-            </div>
-            <div className="text-center">
-              <p className="font-semibold text-foreground">{app.name}</p>
-              <p className="text-xs text-muted-foreground">{app.description}</p>
-            </div>
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm font-medium">Logout</span>
           </button>
-        ))}
+        </div>
+      )}
+
+      {/* Main content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
+        {/* Logo */}
+        <div 
+          className={`mb-8 transition-all duration-700 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        >
+          <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center animate-float animate-glow-pulse">
+            <span className="text-4xl font-bold text-white tracking-tight">S</span>
+          </div>
+        </div>
+
+        {/* Title */}
+        <h1 
+          className={`text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight transition-all duration-700 delay-100 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          style={{ textShadow: "0 4px 30px rgba(0,0,0,0.2)" }}
+        >
+          SCALK
+        </h1>
+        <p 
+          className={`text-white/70 text-lg mb-16 transition-all duration-700 delay-200 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        >
+          Choose an app to get started
+        </p>
+
+        {/* App grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl w-full">
+          {allApps.map((app, index) => (
+            <button
+              key={app.name}
+              onClick={() => navigate(app.path)}
+              className={`app-card flex flex-col items-center gap-4 p-8 rounded-3xl group transition-all duration-700 ${
+                loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+              style={{ transitionDelay: `${300 + index * 100}ms` }}
+            >
+              <div className={`icon-container w-20 h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br ${app.gradient}`}>
+                <app.icon className="w-10 h-10 text-white drop-shadow-lg group-hover:animate-icon-glow" />
+              </div>
+              <div className="text-center">
+                <p className="font-semibold text-white text-lg">{app.name}</p>
+                <p className="text-sm text-white/60 mt-1">{app.description}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Bottom decoration */}
+        <div 
+          className={`mt-20 flex items-center gap-2 transition-all duration-700 delay-700 ${loaded ? "opacity-100" : "opacity-0"}`}
+        >
+          <div className="w-12 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+          <span className="text-white/40 text-xs tracking-widest uppercase">Connect • Play • Explore</span>
+          <div className="w-12 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        </div>
       </div>
     </div>
   );

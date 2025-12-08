@@ -123,6 +123,113 @@ All colors MUST be HSL.
   }
 }
 
+/* Home page gradient */
+.home-gradient {
+  background: linear-gradient(135deg, 
+    hsl(180 60% 45%) 0%, 
+    hsl(195 85% 45%) 25%,
+    hsl(210 70% 50%) 50%,
+    hsl(180 50% 55%) 75%,
+    hsl(160 60% 50%) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(195 85% 50% / 0.3), 0 0 40px hsl(195 85% 50% / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(195 85% 50% / 0.5), 0 0 60px hsl(195 85% 50% / 0.2);
+  }
+}
+
+@keyframes icon-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px currentColor);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-icon-glow {
+  animation: icon-glow 2s ease-in-out infinite;
+}
+
+.app-card {
+  backdrop-filter: blur(20px);
+  background: hsl(0 0% 100% / 0.1);
+  border: 1px solid hsl(0 0% 100% / 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-card:hover {
+  background: hsl(0 0% 100% / 0.2);
+  border-color: hsl(0 0% 100% / 0.4);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px hsl(0 0% 0% / 0.2), 0 0 30px hsl(195 85% 50% / 0.3);
+}
+
+.icon-container {
+  background: hsl(0 0% 100% / 0.15);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.app-card:hover .icon-container {
+  background: hsl(0 0% 100% / 0.25);
+  transform: scale(1.1);
+}
+
+/* Floating orbs */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: orb-float 20s ease-in-out infinite;
+}
+
+@keyframes orb-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
 /* Game animations */
 @keyframes pulse-glow {
   0%, 100% {
