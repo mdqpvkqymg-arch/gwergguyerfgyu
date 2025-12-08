@@ -53,6 +53,7 @@ const Game = () => {
             <TabsTrigger value="reaction" className="text-xs"><Zap className="h-3 w-3 mr-1" />Reaction</TabsTrigger>
             <TabsTrigger value="kartbros" className="text-xs">🏎️ Kart Bros</TabsTrigger>
             <TabsTrigger value="racinglimits" className="text-xs">🏁 Racing Limits</TabsTrigger>
+            <TabsTrigger value="burgerrun" className="text-xs">🍔 Burger Run</TabsTrigger>
             <TabsTrigger value="leaderboard" className="text-xs"><Trophy className="h-3 w-3 mr-1" />Scores</TabsTrigger>
           </TabsList>
 
@@ -73,6 +74,14 @@ const Game = () => {
               title="Racing Limits"
               developer="Vietdp Games"
               description="Test your racing prowess to the limit! Race through urban and highway traffic with realistic physics, precise controls, and multiple camera views."
+            />
+          </TabsContent>
+          <TabsContent value="burgerrun">
+            <ExternalGameEmbed
+              src="https://calculatorsnet.github.io/Burger-Run/"
+              title="Burger Run"
+              developer="Calculatorsnet"
+              description="Run and collect burgers in this fun endless runner game!"
             />
           </TabsContent>
           <TabsContent value="leaderboard"><Leaderboard scores={scores} loading={loading} currentProfileId={currentProfileId} /></TabsContent>
