@@ -30,12 +30,17 @@ export const useGameScores = (currentProfileId: string | null) => {
   const [loading, setLoading] = useState(true);
 
   const fetchScores = useCallback(async () => {
+    // Get scores from the last 7 days only (weekly leaderboard)
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
     const { data, error } = await supabase
       .from("game_scores")
       .select(`
         *,
         profiles(display_name, avatar_color)
       `)
+      .gte("created_at", oneWeekAgo.toISOString())
       .order("score", { ascending: false })
       .limit(100);
 
