@@ -9,6 +9,7 @@ import NewConversationDialog from "@/components/NewConversationDialog";
 import AddMembersDialog from "@/components/AddMembersDialog";
 import { UpdatesDialog } from "@/components/UpdatesDialog";
 import { MainHeader } from "@/components/MainHeader";
+import CompleteProfileDialog from "@/components/CompleteProfileDialog";
 import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useConversations } from "@/hooks/useConversations";
@@ -34,6 +35,8 @@ interface Profile {
   id: string;
   display_name: string;
   avatar_color: string;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 const Index = () => {
@@ -45,6 +48,7 @@ const Index = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [newConversationOpen, setNewConversationOpen] = useState(false);
   const [addMembersOpen, setAddMembersOpen] = useState(false);
+  const [showCompleteProfile, setShowCompleteProfile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
@@ -112,6 +116,11 @@ const Index = () => {
         return;
       }
       setCurrentProfile(data);
+      
+      // Check if profile is incomplete (missing first/last name)
+      if (!data.first_name || !data.last_name) {
+        setShowCompleteProfile(true);
+      }
     };
 
     fetchCurrentProfile();
@@ -339,6 +348,24 @@ const Index = () => {
       )}
 
       <UpdatesDialog />
+
+      <CompleteProfileDialog
+        open={showCompleteProfile}
+        profileId={currentProfile.id}
+        currentDisplayName={currentProfile.display_name}
+        onComplete={() => {
+          setShowCompleteProfile(false);
+          // Refresh profile data
+          supabase
+            .from("profiles")
+            .select("*")
+            .eq("user_id", user.id)
+            .single()
+            .then(({ data }) => {
+              if (data) setCurrentProfile(data);
+            });
+        }}
+      />
     </>
   );
 };

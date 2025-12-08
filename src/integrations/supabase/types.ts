@@ -186,7 +186,9 @@ export type Database = {
           avatar_color: string
           created_at: string
           display_name: string
+          first_name: string | null
           id: string
+          last_name: string | null
           updated_at: string
           user_id: string
         }
@@ -194,7 +196,9 @@ export type Database = {
           avatar_color?: string
           created_at?: string
           display_name: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           updated_at?: string
           user_id: string
         }
@@ -202,7 +206,9 @@ export type Database = {
           avatar_color?: string
           created_at?: string
           display_name?: string
+          first_name?: string | null
           id?: string
+          last_name?: string | null
           updated_at?: string
           user_id?: string
         }
