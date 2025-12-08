@@ -34,9 +34,9 @@ export const useGameScores = (currentProfileId: string | null) => {
         *,
         profiles(display_name, avatar_color)
       `)
+      .in("game_type", ["snake", "minesweeper", "reaction"])
       .gte("created_at", oneWeekAgo.toISOString())
-      .order("score", { ascending: false })
-      .limit(100);
+      .limit(200);
 
     if (error) {
       console.error("Error fetching scores:", error);
@@ -52,13 +52,16 @@ export const useGameScores = (currentProfileId: string | null) => {
     (data || []).forEach((score: any) => {
       const gameType = score.game_type as GameType;
       if (grouped[gameType]) {
-        // For reaction, lower is better, so we'll handle sorting differently
         grouped[gameType].push(score);
       }
     });
 
-    // Sort reaction scores ascending (lower is better)
+    // Sort snake and minesweeper descending (higher is better)
+    grouped.snake.sort((a, b) => b.score - a.score);
+    grouped.minesweeper.sort((a, b) => b.score - a.score);
+    // Sort reaction ascending (lower is better)
     grouped.reaction.sort((a, b) => a.score - b.score);
+    
     // Keep only top 10 for each game
     Object.keys(grouped).forEach(key => {
       grouped[key as GameType] = grouped[key as GameType].slice(0, 10);
