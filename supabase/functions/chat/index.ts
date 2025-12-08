@@ -11,7 +11,33 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const body = await req.json();
+    const { messages } = body;
+
+    // Validate messages array
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
+      console.error("Invalid messages array:", messages?.length);
+      return new Response(JSON.stringify({ error: "Invalid messages array" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate each message
+    for (const msg of messages) {
+      if (
+        typeof msg.role !== "string" ||
+        !["user", "assistant", "system"].includes(msg.role) ||
+        typeof msg.content !== "string" ||
+        msg.content.length > 10000
+      ) {
+        console.error("Invalid message format:", msg);
+        return new Response(JSON.stringify({ error: "Invalid message format" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
