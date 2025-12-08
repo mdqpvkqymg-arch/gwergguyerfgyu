@@ -52,6 +52,7 @@ const Game = () => {
             <TabsTrigger value="minesweeper" className="text-xs"><Bomb className="h-3 w-3 mr-1" />Mines</TabsTrigger>
             <TabsTrigger value="reaction" className="text-xs"><Zap className="h-3 w-3 mr-1" />Reaction</TabsTrigger>
             <TabsTrigger value="kartbros" className="text-xs">🏎️ Kart Bros</TabsTrigger>
+            <TabsTrigger value="racinglimits" className="text-xs">🏁 Racing Limits</TabsTrigger>
             <TabsTrigger value="leaderboard" className="text-xs"><Trophy className="h-3 w-3 mr-1" />Scores</TabsTrigger>
           </TabsList>
 
@@ -64,6 +65,14 @@ const Game = () => {
               title="Kart Bros"
               developer="Vietdp Games"
               description="Kart Bros is a fun multiplayer kart racing game. Race against others and become the champion!"
+            />
+          </TabsContent>
+          <TabsContent value="racinglimits">
+            <ExternalGameEmbed
+              src="https://cdn.vietdp.com/file/vietdp-games/games/t52025/racing-limits/index.html"
+              title="Racing Limits"
+              developer="Vietdp Games"
+              description="Test your racing prowess to the limit! Race through urban and highway traffic with realistic physics, precise controls, and multiple camera views."
             />
           </TabsContent>
           <TabsContent value="leaderboard"><Leaderboard scores={scores} loading={loading} currentProfileId={currentProfileId} /></TabsContent>
