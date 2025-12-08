@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send, Bot, User, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, Bot, User, Loader2, Home } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +26,6 @@ async function streamChat({
   onDone: () => void;
   onError: (error: string) => void;
 }) {
-  // Get the user's session token for authentication
   const { data: { session } } = await supabase.auth.getSession();
   
   if (!session?.access_token) {
@@ -97,7 +95,6 @@ async function streamChat({
     }
   }
 
-  // Final flush
   if (textBuffer.trim()) {
     for (let raw of textBuffer.split("\n")) {
       if (!raw) continue;
@@ -175,29 +172,59 @@ const AI = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="border-b border-border p-4">
+    <div className="min-h-screen home-gradient flex flex-col relative overflow-hidden">
+      {/* Background orbs */}
+      <div className="orb w-96 h-96 bg-purple-400/30 top-[-10%] left-[-10%] pointer-events-none" style={{ animationDelay: "0s" }} />
+      <div className="orb w-80 h-80 bg-indigo-400/30 top-[50%] right-[-5%] pointer-events-none" style={{ animationDelay: "5s" }} />
+      <div className="orb w-64 h-64 bg-cyan-400/30 bottom-[-10%] left-[30%] pointer-events-none" style={{ animationDelay: "10s" }} />
+
+      {/* Header */}
+      <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 p-4 relative z-10">
         <div className="max-w-3xl mx-auto flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate("/")}
+            className="text-white hover:bg-white/10"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div className="flex items-center gap-2">
-            <Bot className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-semibold">Scalk Bot</h1>
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center shadow-lg">
+              <Bot className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-white">Scalk Bot</h1>
+              <p className="text-xs text-white/60">AI Assistant</p>
+            </div>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            asChild
+            className="text-white/80 hover:text-white hover:bg-white/10"
+          >
+            <Link to="/" className="flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </Button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      {/* Chat Area */}
+      <div className="flex-1 overflow-hidden relative z-10">
         <div className="max-w-3xl mx-auto h-full flex flex-col">
           <ScrollArea ref={scrollRef} className="flex-1 p-4">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center text-center">
-              <div className="text-muted-foreground">
-                <Bot className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                <h2 className="text-lg font-medium mb-2">Hey! I'm Scalk Bot</h2>
-                <p className="text-sm">Ask me anything - I'm here to help!</p>
-              </div>
+                <div className="p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center shadow-lg animate-float">
+                    <Bot className="h-10 w-10 text-white" />
+                  </div>
+                  <h2 className="text-lg font-medium mb-2 text-white">Hey! I'm Scalk Bot</h2>
+                  <p className="text-sm text-white/60">Ask me anything - I'm here to help!</p>
+                </div>
               </div>
             ) : (
               <div className="space-y-4 pb-4">
@@ -210,54 +237,59 @@ const AI = () => {
                     )}
                   >
                     {msg.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Bot className="h-5 w-5 text-primary" />
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <Bot className="h-4 w-4 text-white" />
                       </div>
                     )}
-                    <Card
+                    <div
                       className={cn(
-                        "px-4 py-3 max-w-[80%]",
+                        "px-4 py-3 max-w-[80%] rounded-2xl shadow-lg backdrop-blur-md",
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-br-sm"
+                          : "bg-white/20 text-white border border-white/20 rounded-bl-sm"
                       )}
                     >
                       <p className="whitespace-pre-wrap break-words text-sm">
                         {msg.content}
                       </p>
-                    </Card>
+                    </div>
                     {msg.role === "user" && (
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
-                        <User className="h-5 w-5" />
+                      <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 border border-white/20">
+                        <User className="h-4 w-4 text-white" />
                       </div>
                     )}
                   </div>
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
                   <div className="flex gap-3 justify-start">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Bot className="h-5 w-5 text-primary" />
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center shadow-lg">
+                      <Bot className="h-4 w-4 text-white" />
                     </div>
-                    <Card className="px-4 py-3 bg-muted">
-                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                    </Card>
+                    <div className="px-4 py-3 bg-white/20 backdrop-blur-md rounded-2xl rounded-bl-sm border border-white/20">
+                      <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    </div>
                   </div>
                 )}
               </div>
             )}
           </ScrollArea>
 
-          <div className="p-4 border-t border-border">
-            <div className="flex gap-2">
+          {/* Input Area */}
+          <div className="p-4 backdrop-blur-xl bg-white/10 border-t border-white/20">
+            <div className="flex gap-3">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message..."
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-white/30 focus-visible:border-white/30"
               />
-              <Button onClick={sendMessage} disabled={isLoading || !input.trim()}>
+              <Button 
+                onClick={sendMessage} 
+                disabled={isLoading || !input.trim()}
+                className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-lg transition-all duration-300 hover:scale-105"
+              >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
