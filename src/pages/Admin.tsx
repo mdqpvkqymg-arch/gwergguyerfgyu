@@ -23,13 +23,15 @@ const Admin = () => {
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("display_name")
+      // Check if user has admin role
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
         .eq("user_id", user.id)
+        .eq("role", "admin")
         .maybeSingle();
 
-      if (profile?.display_name?.toLowerCase() === "mike") {
+      if (roleData) {
         setIsAdmin(true);
       } else {
         toast.error("Access denied. Admin only.");
