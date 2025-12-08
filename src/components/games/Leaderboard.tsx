@@ -121,8 +121,9 @@ const Leaderboard = ({ scores, loading, currentProfileId }: LeaderboardProps) =>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Trophy className="h-6 w-6 text-yellow-500" />
-          Leaderboard
+          Weekly Leaderboard
         </CardTitle>
+        <p className="text-sm text-muted-foreground">Top scores from the last 7 days</p>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="snake" className="w-full">
