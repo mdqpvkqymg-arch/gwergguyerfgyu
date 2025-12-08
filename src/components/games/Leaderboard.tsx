@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Zap, Bomb, Medal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type GameType = "snake" | "minesweeper" | "reaction" | "tetris" | "pacman" | "bounce" | "puzzle" | "spider" | "defender";
+type GameType = "snake" | "minesweeper" | "reaction";
 
 interface GameScore {
   id: string;
@@ -95,13 +95,7 @@ const ScoreList = ({
 
 const GAME_TABS: { key: GameType; label: string; icon: string; format: (s: number) => string }[] = [
   { key: "snake", label: "Snake", icon: "🐍", format: (s) => `${s} pts` },
-  { key: "tetris", label: "Tetris", icon: "🎮", format: (s) => `${s} pts` },
-  { key: "pacman", label: "Pacman", icon: "👻", format: (s) => `${s} pts` },
-  { key: "bounce", label: "Bounce", icon: "🏓", format: (s) => `${s} pts` },
   { key: "minesweeper", label: "Mines", icon: "💣", format: (s) => `${s} wins` },
-  { key: "puzzle", label: "Puzzle", icon: "🧩", format: (s) => `${s} pts` },
-  { key: "spider", label: "Spider", icon: "🕷️", format: (s) => `${s} pts` },
-  { key: "defender", label: "Defender", icon: "🚀", format: (s) => `${s} pts` },
   { key: "reaction", label: "Reaction", icon: "⚡", format: (s) => `${s}ms` },
 ];
 
