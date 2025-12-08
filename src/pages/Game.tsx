@@ -64,7 +64,6 @@ const Game = () => {
             <TabsTrigger value="spider" className="text-xs">🕷️ Spider</TabsTrigger>
             <TabsTrigger value="defender" className="text-xs">🚀 Defender</TabsTrigger>
             <TabsTrigger value="reaction" className="text-xs"><Zap className="h-3 w-3 mr-1" />Reaction</TabsTrigger>
-            <TabsTrigger value="golforbit" className="text-xs">⛳ Golf Orbit</TabsTrigger>
             <TabsTrigger value="leaderboard" className="text-xs"><Trophy className="h-3 w-3 mr-1" />Scores</TabsTrigger>
           </TabsList>
 
@@ -77,15 +76,6 @@ const Game = () => {
           <TabsContent value="spider"><SpiderGame onScoreSubmit={(score) => submitScore("spider", score)} /></TabsContent>
           <TabsContent value="defender"><DefenderGame onScoreSubmit={(score) => submitScore("defender", score)} /></TabsContent>
           <TabsContent value="reaction"><ReactionGame onScoreSubmit={(score) => submitScore("reaction", score)} /></TabsContent>
-          <TabsContent value="golforbit">
-            <ExternalGameEmbed
-              src="https://pizzaedition.win/assets/mainstorage/golforbit.html"
-              title="Golf Orbit"
-              developer="Creator"
-              description="Golf Orbit is an arcade-style golf game that focuses on hitting the ball as far as possible rather than playing on traditional courses. Each swing sends the ball soaring over landscapes, earning money based on distance and collectibles picked up mid-flight."
-              thumbnail="https://pizzaedition.win/images/games/golforbit-min.jpg"
-            />
-          </TabsContent>
           <TabsContent value="leaderboard"><Leaderboard scores={scores} loading={loading} currentProfileId={currentProfileId} /></TabsContent>
         </Tabs>
       </div>
