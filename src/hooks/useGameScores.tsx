@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type GameType = "snake" | "minesweeper" | "reaction" | "tetris" | "pacman" | "bounce" | "puzzle" | "spider" | "defender";
+type GameType = "snake" | "minesweeper" | "reaction";
 
 interface GameScore {
   id: string;
@@ -20,12 +20,6 @@ export const useGameScores = (currentProfileId: string | null) => {
     snake: [],
     minesweeper: [],
     reaction: [],
-    tetris: [],
-    pacman: [],
-    bounce: [],
-    puzzle: [],
-    spider: [],
-    defender: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -53,12 +47,6 @@ export const useGameScores = (currentProfileId: string | null) => {
       snake: [],
       minesweeper: [],
       reaction: [],
-      tetris: [],
-      pacman: [],
-      bounce: [],
-      puzzle: [],
-      spider: [],
-      defender: [],
     };
 
     (data || []).forEach((score: any) => {
