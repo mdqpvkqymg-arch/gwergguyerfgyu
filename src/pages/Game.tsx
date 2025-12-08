@@ -52,6 +52,7 @@ const Game = () => {
             <TabsTrigger value="minesweeper" className="text-xs"><Bomb className="h-3 w-3 mr-1" />Mines</TabsTrigger>
             <TabsTrigger value="reaction" className="text-xs"><Zap className="h-3 w-3 mr-1" />Reaction</TabsTrigger>
             <TabsTrigger value="kartbros" className="text-xs">🏎️ Kart Bros</TabsTrigger>
+            <TabsTrigger value="jellydrift" className="text-xs">🚗 Jelly Drift</TabsTrigger>
             <TabsTrigger value="leaderboard" className="text-xs"><Trophy className="h-3 w-3 mr-1" />Scores</TabsTrigger>
           </TabsList>
 
@@ -64,6 +65,14 @@ const Game = () => {
               title="Kart Bros"
               developer="Vietdp Games"
               description="Kart Bros is a fun multiplayer kart racing game. Race against others and become the champion!"
+            />
+          </TabsContent>
+          <TabsContent value="jellydrift">
+            <ExternalGameEmbed
+              src="https://cdn.jsdelivr.net/gh/genizy/web-port@main/jelly-drift/index.html"
+              title="Jelly Drift"
+              developer="Genizy"
+              description="Jelly Drift is a fun drifting game where you control a jelly car through various tracks. Master the art of drifting!"
             />
           </TabsContent>
           <TabsContent value="leaderboard"><Leaderboard scores={scores} loading={loading} currentProfileId={currentProfileId} /></TabsContent>
