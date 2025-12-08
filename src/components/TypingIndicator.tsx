@@ -18,23 +18,23 @@ const TypingIndicator = ({ typingUsers }: TypingIndicatorProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2 px-6 py-2 text-sm text-muted-foreground">
+    <div className="flex items-center gap-2 px-6 py-2 text-sm text-white/70 backdrop-blur-md bg-white/5">
       <div className="flex gap-1">
         <span
           className={cn(
-            "w-2 h-2 bg-primary rounded-full animate-bounce",
+            "w-2 h-2 bg-white/80 rounded-full animate-bounce",
             "[animation-delay:0ms]"
           )}
         />
         <span
           className={cn(
-            "w-2 h-2 bg-primary rounded-full animate-bounce",
+            "w-2 h-2 bg-white/80 rounded-full animate-bounce",
             "[animation-delay:150ms]"
           )}
         />
         <span
           className={cn(
-            "w-2 h-2 bg-primary rounded-full animate-bounce",
+            "w-2 h-2 bg-white/80 rounded-full animate-bounce",
             "[animation-delay:300ms]"
           )}
         />
