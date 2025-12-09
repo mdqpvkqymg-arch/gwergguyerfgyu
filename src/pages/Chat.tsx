@@ -25,9 +25,11 @@ interface Message {
   sender_id: string;
   created_at: string;
   conversation_id: string;
+  image_url: string | null;
   profiles: {
     display_name: string;
     avatar_color: string;
+    avatar_url: string | null;
   };
 }
 
@@ -35,8 +37,10 @@ interface Profile {
   id: string;
   display_name: string;
   avatar_color: string;
+  avatar_url: string | null;
   first_name: string | null;
   last_name: string | null;
+  user_id: string;
 }
 
 const Index = () => {
@@ -158,7 +162,7 @@ const Index = () => {
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from("messages")
-        .select("*, profiles(display_name, avatar_color)")
+        .select("*, profiles(display_name, avatar_color, avatar_url)")
         .eq("conversation_id", selectedConversationId)
         .order("created_at", { ascending: true });
       
@@ -185,7 +189,7 @@ const Index = () => {
         async (payload) => {
           const { data: profileData } = await supabase
             .from("profiles")
-            .select("display_name, avatar_color")
+            .select("display_name, avatar_color, avatar_url")
             .eq("id", payload.new.sender_id)
             .single();
 
@@ -212,13 +216,14 @@ const Index = () => {
     });
   }, [messages]);
 
-  const handleSendMessage = useCallback(async (messageText: string) => {
+  const handleSendMessage = useCallback(async (messageText: string, imageUrl?: string) => {
     if (!currentProfile || !selectedConversationId) return;
 
     const { error } = await supabase.from("messages").insert({
       content: messageText,
       sender_id: currentProfile.id,
       conversation_id: selectedConversationId,
+      image_url: imageUrl || null,
     });
 
     if (error) {
@@ -314,6 +319,8 @@ const Index = () => {
                     })}
                     isCurrentUser={msg.sender_id === currentProfile.id}
                     avatarColor={msg.profiles.avatar_color}
+                    avatarUrl={msg.profiles.avatar_url}
+                    imageUrl={msg.image_url}
                   />
                 ))}
                 <div ref={messagesEndRef} />
@@ -328,6 +335,7 @@ const Index = () => {
                 onSendMessage={handleSendMessage} 
                 onTyping={handleTyping}
                 onStopTyping={stopTyping}
+                userId={currentProfile.user_id}
               />
             </>
           )}
@@ -360,6 +368,7 @@ const Index = () => {
         open={showCompleteProfile}
         profileId={currentProfile.id}
         currentDisplayName={currentProfile.display_name}
+        userId={currentProfile.user_id}
         onComplete={() => {
           setShowCompleteProfile(false);
           // Refresh profile data
