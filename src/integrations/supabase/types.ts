@@ -148,6 +148,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          image_url: string | null
           sender_id: string
         }
         Insert: {
@@ -155,6 +156,7 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
+          image_url?: string | null
           sender_id: string
         }
         Update: {
@@ -162,6 +164,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           sender_id?: string
         }
         Relationships: [
@@ -184,6 +187,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_color: string
+          avatar_url: string | null
           created_at: string
           display_name: string
           first_name: string | null
@@ -194,6 +198,7 @@ export type Database = {
         }
         Insert: {
           avatar_color?: string
+          avatar_url?: string | null
           created_at?: string
           display_name: string
           first_name?: string | null
@@ -204,6 +209,7 @@ export type Database = {
         }
         Update: {
           avatar_color?: string
+          avatar_url?: string | null
           created_at?: string
           display_name?: string
           first_name?: string | null

@@ -8,15 +8,21 @@ interface ChatMessageProps {
   timestamp: string;
   isCurrentUser?: boolean;
   avatarColor: string;
+  avatarUrl?: string | null;
+  imageUrl?: string | null;
 }
 
-const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarColor }: ChatMessageProps) => {
+const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarColor, avatarUrl, imageUrl }: ChatMessageProps) => {
   return (
     <div className={cn("flex gap-3 mb-4", isCurrentUser && "flex-row-reverse")}>
       <Avatar className={cn("h-10 w-10 ring-2 ring-white/20")}>
-        <AvatarFallback className={cn("font-semibold text-white", avatarColor)}>
-          {sender.substring(0, 2).toUpperCase()}
-        </AvatarFallback>
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={sender} className="h-full w-full object-cover" />
+        ) : (
+          <AvatarFallback className={cn("font-semibold text-white")} style={{ backgroundColor: avatarColor }}>
+            {sender.substring(0, 2).toUpperCase()}
+          </AvatarFallback>
+        )}
       </Avatar>
       
       <div className={cn("flex flex-col max-w-[70%] min-w-0", isCurrentUser && "items-end")}>
@@ -33,7 +39,18 @@ const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarCol
               : "bg-white/20 text-white border border-white/20 rounded-bl-sm"
           )}
         >
-          <p className="text-sm leading-relaxed break-all whitespace-pre-wrap">{message}</p>
+          {imageUrl && (
+            <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="block mb-2">
+              <img
+                src={imageUrl}
+                alt="Shared image"
+                className="max-w-full max-h-64 rounded-lg object-cover hover:opacity-90 transition-opacity"
+              />
+            </a>
+          )}
+          {message && message !== "📷 Photo" && (
+            <p className="text-sm leading-relaxed break-all whitespace-pre-wrap">{message}</p>
+          )}
         </div>
       </div>
     </div>
