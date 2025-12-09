@@ -96,7 +96,7 @@ const ConversationsList = ({
         </h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 overflow-y-auto p-2 pb-6 space-y-1">
         {conversations.map((conv) => {
           const display = getConversationDisplay(conv);
           return (
