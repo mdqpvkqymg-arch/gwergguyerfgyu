@@ -136,6 +136,18 @@ All colors MUST be HSL.
   animation: gradient-shift 15s ease infinite;
 }
 
+.dark .home-gradient {
+  background: linear-gradient(135deg, 
+    hsl(220 30% 12%) 0%, 
+    hsl(230 25% 15%) 25%,
+    hsl(240 20% 18%) 50%,
+    hsl(250 25% 14%) 75%,
+    hsl(260 20% 12%) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
 @keyframes gradient-shift {
   0%, 100% {
     background-position: 0% 50%;
@@ -216,6 +228,10 @@ All colors MUST be HSL.
   filter: blur(60px);
   opacity: 0.4;
   animation: orb-float 20s ease-in-out infinite;
+}
+
+.dark .orb {
+  opacity: 0.2;
 }
 
 @keyframes orb-float {
