@@ -93,8 +93,12 @@ const Home = () => {
         <div 
           className={`mb-8 transition-all duration-700 ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
         >
-          <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center animate-float animate-glow-pulse">
-            <span className="text-4xl font-bold text-white tracking-tight">S</span>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-3xl blur-xl opacity-60 animate-pulse" />
+            <div className="relative w-28 h-28 rounded-3xl bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 flex items-center justify-center animate-float shadow-2xl border border-white/30">
+              <div className="absolute inset-1 bg-gradient-to-br from-white/20 to-transparent rounded-2xl" />
+              <span className="text-5xl font-black text-white tracking-tighter drop-shadow-lg" style={{ fontFamily: "'Inter', sans-serif" }}>S</span>
+            </div>
           </div>
         </div>
 

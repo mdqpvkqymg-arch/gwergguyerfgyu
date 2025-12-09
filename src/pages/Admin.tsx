@@ -59,21 +59,29 @@ const Admin = () => {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen home-gradient relative overflow-hidden">
+      {/* Background orbs */}
+      <div className="orb w-96 h-96 bg-rose-400/30 top-[-10%] left-[-10%] pointer-events-none" style={{ animationDelay: "0s" }} />
+      <div className="orb w-80 h-80 bg-red-400/30 top-[50%] right-[-5%] pointer-events-none" style={{ animationDelay: "5s" }} />
+      <div className="orb w-64 h-64 bg-orange-400/30 bottom-[-10%] left-[30%] pointer-events-none" style={{ animationDelay: "10s" }} />
+
       {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+      <div className="backdrop-blur-xl bg-white/10 border-b border-white/20 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="text-white hover:bg-white/10">
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-primary" />
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-rose-400 to-red-600 rounded-xl blur-md opacity-50" />
+                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-rose-400 via-red-500 to-orange-500 flex items-center justify-center shadow-lg border border-white/30">
+                  <Shield className="h-5 w-5 text-white drop-shadow-md" />
+                </div>
               </div>
               <div>
-                <h1 className="text-xl font-bold">Admin Panel</h1>
-                <p className="text-xs text-muted-foreground">Manage your application</p>
+                <h1 className="text-xl font-black text-white tracking-tight">Admin Panel</h1>
+                <p className="text-xs text-white/60 font-medium">Manage your application</p>
               </div>
             </div>
           </div>
@@ -81,42 +89,44 @@ const Admin = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto p-4">
+      <div className="max-w-6xl mx-auto p-4 relative z-10">
         <Tabs defaultValue="stats" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="stats" className="gap-2">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid backdrop-blur-xl bg-white/10 border border-white/20">
+            <TabsTrigger value="stats" className="gap-2 text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Stats</span>
             </TabsTrigger>
-            <TabsTrigger value="updates" className="gap-2">
+            <TabsTrigger value="updates" className="gap-2 text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">
               <Megaphone className="h-4 w-4" />
               <span className="hidden sm:inline">Updates</span>
             </TabsTrigger>
-            <TabsTrigger value="users" className="gap-2">
+            <TabsTrigger value="users" className="gap-2 text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Users</span>
             </TabsTrigger>
-            <TabsTrigger value="scores" className="gap-2">
+            <TabsTrigger value="scores" className="gap-2 text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">
               <Trophy className="h-4 w-4" />
               <span className="hidden sm:inline">Scores</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="stats">
-            <AdminStats />
-          </TabsContent>
+          <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6">
+            <TabsContent value="stats" className="mt-0">
+              <AdminStats />
+            </TabsContent>
 
-          <TabsContent value="updates">
-            <AdminUpdates />
-          </TabsContent>
+            <TabsContent value="updates" className="mt-0">
+              <AdminUpdates />
+            </TabsContent>
 
-          <TabsContent value="users">
-            <AdminUsers />
-          </TabsContent>
+            <TabsContent value="users" className="mt-0">
+              <AdminUsers />
+            </TabsContent>
 
-          <TabsContent value="scores">
-            <AdminScores />
-          </TabsContent>
+            <TabsContent value="scores" className="mt-0">
+              <AdminScores />
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>

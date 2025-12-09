@@ -54,12 +54,15 @@ const Game = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-3 flex-1">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg">
-              <Gamepad2 className="h-5 w-5 text-white" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl blur-md opacity-50" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg border border-white/30">
+                <Gamepad2 className="h-5 w-5 text-white drop-shadow-md" />
+              </div>
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-white">Games</h1>
-              <p className="text-xs text-white/60">Play & Compete</p>
+              <h1 className="text-xl font-black text-white tracking-tight">Games</h1>
+              <p className="text-xs text-white/60 font-medium">Play & Compete</p>
             </div>
           </div>
           <Button
