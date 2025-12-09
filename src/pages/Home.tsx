@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, Gamepad2, Bot, Shield, LogOut } from "lucide-react";
+import { MessageCircle, Gamepad2, Bot, Shield, LogOut, ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,6 +10,13 @@ const apps = [
     path: "/chat",
     gradient: "from-cyan-400 to-blue-500",
     description: "Message your friends",
+  },
+  {
+    name: "Feed",
+    icon: ImageIcon,
+    path: "/feed",
+    gradient: "from-pink-400 to-orange-500",
+    description: "Share photos & videos",
   },
   {
     name: "Games",
