@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { MessageCircle, Gamepad2, Bot, Shield, LogOut, ImageIcon } from "lucide-react";
+import { MessageCircle, Gamepad2, Bot, Shield, LogOut, ImageIcon, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,6 +31,13 @@ const apps = [
     path: "/ai",
     gradient: "from-purple-400 to-indigo-500",
     description: "Chat with Scalk Bot",
+  },
+  {
+    name: "Settings",
+    icon: Settings,
+    path: "/settings",
+    gradient: "from-slate-400 to-gray-500",
+    description: "Customize your app",
   },
 ];
 
