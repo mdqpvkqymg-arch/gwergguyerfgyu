@@ -40,7 +40,7 @@ export const MainHeader = ({
   const isAdmin = currentProfileName.toLowerCase() === "mike";
 
   return (
-    <header className="backdrop-blur-xl bg-white/10 border-b border-white/20 px-4 md:px-6 py-3 shadow-lg">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/10 border-b border-white/20 px-4 md:px-6 py-3 shadow-lg">
       <div className="flex items-center justify-between">
         {/* Logo Section */}
         <div className="flex items-center gap-3">
