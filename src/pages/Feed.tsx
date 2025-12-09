@@ -211,28 +211,34 @@ const Feed = () => {
         </div>
       </header>
 
-      {/* Feed content */}
-      <main className="relative z-10 max-w-2xl mx-auto px-4 py-6 space-y-6">
+      {/* Feed content - Instagram-style snap scrolling */}
+      <main className="relative z-10 h-[calc(100vh-73px)] overflow-y-auto snap-y snap-mandatory">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
+          <div className="h-full flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-white/20 flex items-center justify-center">
+          <div className="h-full flex flex-col items-center justify-center">
+            <div className="w-20 h-20 mb-4 rounded-2xl bg-white/20 flex items-center justify-center">
               <Plus className="w-10 h-10 text-white/70" />
             </div>
             <p className="text-lg font-medium text-white">No posts yet</p>
             <p className="text-sm mt-2 text-white/60">Be the first to share something!</p>
           </div>
         ) : (
-          posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              currentProfileId={currentProfileId}
-              onRefresh={fetchPosts}
-            />
+          posts.map((post, index) => (
+            <div 
+              key={post.id} 
+              className="h-[calc(100vh-73px)] snap-start snap-always flex items-center justify-center p-4"
+            >
+              <div className="w-full max-w-lg">
+                <PostCard
+                  post={post}
+                  currentProfileId={currentProfileId}
+                  onRefresh={fetchPosts}
+                />
+              </div>
+            </div>
           ))
         )}
       </main>
