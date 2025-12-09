@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Zap, Trophy, RotateCcw, Timer } from "lucide-react";
+import { Zap, Trophy, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -101,8 +100,8 @@ const ReactionGame = ({ onScoreSubmit }: ReactionGameProps) => {
         };
       default: 
         return {
-          background: 'linear-gradient(135deg, hsl(215, 25%, 20%), hsl(215, 30%, 15%))',
-          boxShadow: '0 0 40px hsl(195, 85%, 50% / 0.2), inset 0 0 60px hsl(215, 25%, 10% / 0.5)',
+          background: 'rgba(0,0,0,0.3)',
+          boxShadow: '0 0 40px hsl(195, 85%, 50% / 0.2), inset 0 0 60px rgba(0,0,0,0.3)',
         };
     }
   };
@@ -121,35 +120,32 @@ const ReactionGame = ({ onScoreSubmit }: ReactionGameProps) => {
   };
 
   const getTimeRating = (time: number): { label: string; color: string } => {
-    if (time < 200) return { label: "Incredible!", color: "text-purple-400" };
-    if (time < 250) return { label: "Amazing!", color: "text-emerald-400" };
-    if (time < 300) return { label: "Great!", color: "text-cyan-400" };
-    if (time < 400) return { label: "Good", color: "text-amber-400" };
-    return { label: "Keep practicing", color: "text-muted-foreground" };
+    if (time < 200) return { label: "Incredible!", color: "text-purple-300" };
+    if (time < 250) return { label: "Amazing!", color: "text-emerald-300" };
+    if (time < 300) return { label: "Great!", color: "text-cyan-300" };
+    if (time < 400) return { label: "Good", color: "text-amber-300" };
+    return { label: "Keep practicing", color: "text-white/50" };
   };
 
   const message = getMessage();
 
   return (
     <div>
-      <Card className="mb-6 bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-6 w-6 text-amber-400" />
-            <span className="text-amber-200">Reaction Time</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Click as fast as you can when the color changes to green!
-          </p>
-        </CardContent>
-      </Card>
+      {/* Game Info Card */}
+      <div className="mb-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-2">
+          <Zap className="h-6 w-6 text-amber-400" />
+          Reaction Time
+        </h2>
+        <p className="text-white/60">
+          Click as fast as you can when the color changes to green!
+        </p>
+      </div>
 
       <div
         onClick={handleClick}
         className={cn(
-          "h-72 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 select-none border-2 border-white/10",
+          "h-72 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 select-none border-2 border-white/20",
           gameState === "go" && "animate-reaction-pulse"
         )}
         style={getBackgroundStyle()}
@@ -175,67 +171,61 @@ const ReactionGame = ({ onScoreSubmit }: ReactionGameProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mt-6">
-        <Card className="bg-gradient-to-br from-amber-500/10 to-transparent border-amber-500/20">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Trophy className="h-5 w-5 text-amber-400" />
-              <span className="text-sm">Best Time</span>
-            </div>
-            <p className="text-3xl font-bold text-amber-400">
-              {bestTime ? (
-                <>
-                  {bestTime}
-                  <span className="text-lg text-amber-400/70">ms</span>
-                </>
-              ) : "—"}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="backdrop-blur-xl bg-white/10 border border-amber-400/30 rounded-2xl p-6">
+          <div className="flex items-center gap-2 text-white/60 mb-2">
+            <Trophy className="h-5 w-5 text-amber-400" />
+            <span className="text-sm">Best Time</span>
+          </div>
+          <p className="text-3xl font-bold text-amber-400">
+            {bestTime ? (
+              <>
+                {bestTime}
+                <span className="text-lg text-amber-400/70">ms</span>
+              </>
+            ) : "—"}
+          </p>
+        </div>
 
-        <Card className="bg-gradient-to-br from-cyan-500/10 to-transparent border-cyan-500/20">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-2 text-muted-foreground mb-2">
-              <Timer className="h-5 w-5 text-cyan-400" />
-              <span className="text-sm">Average (last 5)</span>
-            </div>
-            <p className="text-3xl font-bold text-cyan-400">
-              {averageTime ? (
-                <>
-                  {averageTime}
-                  <span className="text-lg text-cyan-400/70">ms</span>
-                </>
-              ) : "—"}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="backdrop-blur-xl bg-white/10 border border-cyan-400/30 rounded-2xl p-6">
+          <div className="flex items-center gap-2 text-white/60 mb-2">
+            <Timer className="h-5 w-5 text-cyan-400" />
+            <span className="text-sm">Average (last 5)</span>
+          </div>
+          <p className="text-3xl font-bold text-cyan-400">
+            {averageTime ? (
+              <>
+                {averageTime}
+                <span className="text-lg text-cyan-400/70">ms</span>
+              </>
+            ) : "—"}
+          </p>
+        </div>
       </div>
 
       {attempts.length > 0 && (
-        <Card className="mt-4 bg-card/50 border-border/50">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-3">Recent attempts</p>
-            <div className="flex gap-2 flex-wrap">
-              {attempts.map((time, i) => {
-                const rating = getTimeRating(time);
-                return (
-                  <span 
-                    key={i}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm font-semibold transition-all",
-                      "bg-gradient-to-r from-slate-700/50 to-slate-800/50 border border-slate-600/30",
-                      rating.color
-                    )}
-                    style={{
-                      textShadow: '0 0 10px currentColor',
-                    }}
-                  >
-                    {time}ms
-                  </span>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="mt-4 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6">
+          <p className="text-sm text-white/60 mb-3">Recent attempts</p>
+          <div className="flex gap-2 flex-wrap">
+            {attempts.map((time, i) => {
+              const rating = getTimeRating(time);
+              return (
+                <span 
+                  key={i}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-semibold transition-all",
+                    "bg-white/10 border border-white/20",
+                    rating.color
+                  )}
+                  style={{
+                    textShadow: '0 0 10px currentColor',
+                  }}
+                >
+                  {time}ms
+                </span>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );

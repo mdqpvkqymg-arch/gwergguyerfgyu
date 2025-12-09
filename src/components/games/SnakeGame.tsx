@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Play, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -177,44 +176,41 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
 
   return (
     <div>
-      <Card className="mb-6 bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border-emerald-500/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-emerald-400">
-            🐍 Snake
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Use arrow keys or WASD to move. Eat food to grow!
-          </p>
-        </CardContent>
-      </Card>
+      {/* Game Info Card */}
+      <div className="mb-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-2">
+          🐍 Snake
+        </h2>
+        <p className="text-white/60">
+          Use arrow keys or WASD to move. Eat food to grow!
+        </p>
+      </div>
 
       <div className="flex flex-col items-center gap-4">
         <div className="flex gap-6 mb-2">
-          <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-full border border-border">
-            <span className="text-muted-foreground text-sm">Score</span>
+          <div className="flex items-center gap-2 backdrop-blur-md bg-white/10 px-4 py-2 rounded-full border border-white/20">
+            <span className="text-white/60 text-sm">Score</span>
             <span className={cn(
-              "font-bold text-2xl text-emerald-400 transition-transform",
+              "font-bold text-2xl text-emerald-300 transition-transform",
               scoreAnimating && "animate-score-pop"
             )}>
               {score}
             </span>
           </div>
-          <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-full border border-amber-500/30">
+          <div className="flex items-center gap-2 backdrop-blur-md bg-white/10 px-4 py-2 rounded-full border border-amber-400/30">
             <Trophy className="h-5 w-5 text-amber-400" />
             <span className="font-bold text-2xl text-amber-400">{highScore}</span>
           </div>
         </div>
 
         <div 
-          className="relative rounded-xl overflow-hidden"
+          className="relative rounded-2xl overflow-hidden"
           style={{ 
             width: GRID_SIZE * CELL_SIZE + 4, 
             height: GRID_SIZE * CELL_SIZE + 4,
-            background: 'linear-gradient(135deg, hsl(220, 20%, 8%), hsl(220, 25%, 12%))',
-            boxShadow: '0 0 40px hsl(142, 76%, 50% / 0.1), inset 0 0 60px hsl(220, 25%, 5%)',
-            border: '2px solid hsl(220, 25%, 20%)',
+            background: 'linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3))',
+            boxShadow: '0 0 40px hsl(142, 76%, 50% / 0.1), inset 0 0 60px rgba(0,0,0,0.3)',
+            border: '2px solid rgba(255,255,255,0.2)',
           }}
         >
           {/* Grid pattern */}
@@ -222,8 +218,8 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
             className="absolute inset-0 opacity-20"
             style={{
               backgroundImage: `
-                linear-gradient(hsl(220, 25%, 25%) 1px, transparent 1px),
-                linear-gradient(90deg, hsl(220, 25%, 25%) 1px, transparent 1px)
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
               `,
               backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`,
             }}
@@ -261,7 +257,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           
           {/* Overlay */}
           {!isPlaying && (
-            <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center">
               <div className="text-center">
                 {gameOver && (
                   <p className="text-2xl font-bold text-red-400 mb-4 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">
@@ -287,7 +283,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
-            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
             onClick={() => { if (directionRef.current !== "DOWN") { directionRef.current = "UP"; setDirection("UP"); }}}
           >
             ↑
@@ -296,7 +292,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
-            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
             onClick={() => { if (directionRef.current !== "RIGHT") { directionRef.current = "LEFT"; setDirection("LEFT"); }}}
           >
             ←
@@ -304,7 +300,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
-            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
             onClick={() => { if (directionRef.current !== "UP") { directionRef.current = "DOWN"; setDirection("DOWN"); }}}
           >
             ↓
@@ -312,7 +308,7 @@ const SnakeGame = ({ onScoreSubmit }: SnakeGameProps) => {
           <Button 
             variant="outline" 
             size="lg"
-            className="bg-card/50 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50"
+            className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
             onClick={() => { if (directionRef.current !== "LEFT") { directionRef.current = "RIGHT"; setDirection("RIGHT"); }}}
           >
             →

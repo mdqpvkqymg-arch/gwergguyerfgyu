@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Flag, Bomb, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -165,57 +164,54 @@ const MinesweeperGame = ({ onScoreSubmit }: MinesweeperGameProps) => {
   const getNumberColor = (num: number): string => {
     const colors = [
       "", 
-      "text-blue-400", 
-      "text-emerald-400", 
-      "text-red-400", 
-      "text-purple-400", 
-      "text-amber-400", 
-      "text-cyan-400", 
-      "text-pink-400", 
-      "text-gray-400"
+      "text-blue-300", 
+      "text-emerald-300", 
+      "text-red-300", 
+      "text-purple-300", 
+      "text-amber-300", 
+      "text-cyan-300", 
+      "text-pink-300", 
+      "text-gray-300"
     ];
     return colors[num] || "";
   };
 
   return (
     <div>
-      <Card className="mb-6 bg-gradient-to-br from-slate-500/10 to-purple-500/10 border-slate-500/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bomb className="h-6 w-6 text-slate-400" />
-            <span className="text-slate-200">Minesweeper</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Left click to reveal, right click to flag. Find all mines!
-          </p>
-        </CardContent>
-      </Card>
+      {/* Game Info Card */}
+      <div className="mb-6 backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-6">
+        <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-2">
+          <Bomb className="h-6 w-6" />
+          Minesweeper
+        </h2>
+        <p className="text-white/60">
+          Left click to reveal, right click to flag. Find all mines!
+        </p>
+      </div>
 
       <div className="flex flex-col items-center gap-4">
         <div className="flex gap-6 mb-2">
-          <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-full border border-red-500/30">
+          <div className="flex items-center gap-2 backdrop-blur-md bg-white/10 px-4 py-2 rounded-full border border-red-400/30">
             <Flag className="h-5 w-5 text-red-400" />
             <span className="font-bold text-xl text-red-400">{flagCount}</span>
-            <span className="text-muted-foreground">/</span>
-            <span className="font-bold text-xl text-muted-foreground">{MINE_COUNT}</span>
+            <span className="text-white/50">/</span>
+            <span className="font-bold text-xl text-white/50">{MINE_COUNT}</span>
           </div>
-          <div className="flex items-center gap-2 bg-card/50 px-4 py-2 rounded-full border border-amber-500/30">
+          <div className="flex items-center gap-2 backdrop-blur-md bg-white/10 px-4 py-2 rounded-full border border-amber-400/30">
             <Trophy className="h-5 w-5 text-amber-400" />
             <span className="font-bold text-xl text-amber-400">{gamesWon}</span>
-            <span className="text-muted-foreground text-sm ml-1">wins</span>
+            <span className="text-white/50 text-sm ml-1">wins</span>
           </div>
         </div>
 
         <div className="relative">
           <div 
-            className="grid gap-1 p-3 rounded-xl"
+            className="grid gap-1 p-3 rounded-2xl"
             style={{ 
               gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-              background: 'linear-gradient(135deg, hsl(220, 20%, 10%), hsl(220, 25%, 14%))',
-              boxShadow: '0 0 40px hsl(260, 50%, 50% / 0.1), inset 0 0 30px hsl(220, 25%, 5%)',
-              border: '2px solid hsl(220, 25%, 20%)',
+              background: 'rgba(0,0,0,0.4)',
+              boxShadow: '0 0 40px rgba(139, 92, 246, 0.1), inset 0 0 30px rgba(0,0,0,0.3)',
+              border: '2px solid rgba(255,255,255,0.15)',
             }}
           >
             {grid.map((row, y) =>
@@ -225,12 +221,12 @@ const MinesweeperGame = ({ onScoreSubmit }: MinesweeperGameProps) => {
                   onClick={() => handleCellClick(x, y)}
                   onContextMenu={(e) => handleRightClick(e, x, y)}
                   className={cn(
-                    "w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-sm font-bold rounded-md transition-all duration-150",
+                    "w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-sm font-bold rounded-lg transition-all duration-150",
                     cell.isRevealed
                       ? cell.isMine
                         ? "bg-gradient-to-br from-red-500 to-red-700 shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-                        : "bg-slate-800/80 shadow-inner"
-                      : "bg-gradient-to-br from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 shadow-md hover:shadow-lg cursor-pointer border border-slate-500/30",
+                        : "bg-white/10 backdrop-blur-sm shadow-inner"
+                      : "bg-white/20 hover:bg-white/30 shadow-md hover:shadow-lg cursor-pointer border border-white/20",
                     cell.isRevealed && revealedCells.has(`${x}-${y}`) && "animate-cell-reveal",
                     getNumberColor(cell.adjacentMines)
                   )}
@@ -252,7 +248,7 @@ const MinesweeperGame = ({ onScoreSubmit }: MinesweeperGameProps) => {
           </div>
 
           {(gameOver || won) && (
-            <div className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center rounded-xl">
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-2xl">
               <div className="text-center">
                 <p className={cn(
                   "text-2xl font-bold mb-4",
