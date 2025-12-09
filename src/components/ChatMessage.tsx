@@ -9,10 +9,13 @@ interface ChatMessageProps {
   isCurrentUser?: boolean;
   avatarColor: string;
   avatarUrl?: string | null;
-  imageUrl?: string | null;
+  mediaUrl?: string | null;
+  mediaType?: "image" | "video" | null;
 }
 
-const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarColor, avatarUrl, imageUrl }: ChatMessageProps) => {
+const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarColor, avatarUrl, mediaUrl, mediaType }: ChatMessageProps) => {
+  const isMediaOnly = message === "📷 Photo" || message === "🎥 Video";
+
   return (
     <div className={cn("flex gap-3 mb-4", isCurrentUser && "flex-row-reverse")}>
       <Avatar className={cn("h-10 w-10 ring-2 ring-white/20")}>
@@ -39,16 +42,25 @@ const ChatMessage = memo(({ message, sender, timestamp, isCurrentUser, avatarCol
               : "bg-white/20 text-white border border-white/20 rounded-bl-sm"
           )}
         >
-          {imageUrl && (
-            <a href={imageUrl} target="_blank" rel="noopener noreferrer" className="block mb-2">
+          {mediaUrl && mediaType === "image" && (
+            <a href={mediaUrl} target="_blank" rel="noopener noreferrer" className="block mb-2">
               <img
-                src={imageUrl}
+                src={mediaUrl}
                 alt="Shared image"
                 className="max-w-full max-h-64 rounded-lg object-cover hover:opacity-90 transition-opacity"
               />
             </a>
           )}
-          {message && message !== "📷 Photo" && (
+          {mediaUrl && mediaType === "video" && (
+            <div className="mb-2">
+              <video
+                src={mediaUrl}
+                controls
+                className="max-w-full max-h-64 rounded-lg object-contain"
+              />
+            </div>
+          )}
+          {message && !isMediaOnly && (
             <p className="text-sm leading-relaxed break-all whitespace-pre-wrap">{message}</p>
           )}
         </div>

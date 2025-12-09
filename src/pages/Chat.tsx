@@ -26,6 +26,7 @@ interface Message {
   created_at: string;
   conversation_id: string;
   image_url: string | null;
+  media_type: "image" | "video" | null;
   profiles: {
     display_name: string;
     avatar_color: string;
@@ -170,7 +171,10 @@ const Index = () => {
         console.error("Error fetching messages:", error);
         return;
       }
-      setMessages(data || []);
+      setMessages((data || []).map(msg => ({
+        ...msg,
+        media_type: msg.media_type as "image" | "video" | null
+      })));
     };
 
     fetchMessages();
@@ -216,14 +220,15 @@ const Index = () => {
     });
   }, [messages]);
 
-  const handleSendMessage = useCallback(async (messageText: string, imageUrl?: string) => {
+  const handleSendMessage = useCallback(async (messageText: string, mediaUrl?: string, mediaType?: "image" | "video") => {
     if (!currentProfile || !selectedConversationId) return;
 
     const { error } = await supabase.from("messages").insert({
       content: messageText,
       sender_id: currentProfile.id,
       conversation_id: selectedConversationId,
-      image_url: imageUrl || null,
+      image_url: mediaUrl || null,
+      media_type: mediaType || null,
     });
 
     if (error) {
@@ -320,7 +325,8 @@ const Index = () => {
                     isCurrentUser={msg.sender_id === currentProfile.id}
                     avatarColor={msg.profiles.avatar_color}
                     avatarUrl={msg.profiles.avatar_url}
-                    imageUrl={msg.image_url}
+                    mediaUrl={msg.image_url}
+                    mediaType={msg.media_type}
                   />
                 ))}
                 <div ref={messagesEndRef} />
