@@ -89,6 +89,7 @@ const Game = () => {
               <TabsTrigger value="reaction" className="text-xs text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white"><Zap className="h-3 w-3 mr-1" />Reaction</TabsTrigger>
               <TabsTrigger value="kartbros" className="text-xs text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">🏎️ Kart Bros</TabsTrigger>
               <TabsTrigger value="racinglimits" className="text-xs text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">🏁 Racing Limits</TabsTrigger>
+              <TabsTrigger value="smashkarts" className="text-xs text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">💥 Smash Karts</TabsTrigger>
               <TabsTrigger value="ageofwar" className="text-xs text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white">⚔️ Age of War</TabsTrigger>
               <TabsTrigger value="leaderboard" className="text-xs text-white/80 data-[state=active]:bg-white/20 data-[state=active]:text-white"><Trophy className="h-3 w-3 mr-1" />Scores</TabsTrigger>
             </TabsList>
@@ -110,6 +111,14 @@ const Game = () => {
                 title="Racing Limits"
                 developer="Vietdp Games"
                 description="Test your racing prowess to the limit! Race through urban and highway traffic with realistic physics, precise controls, and multiple camera views."
+              />
+            </TabsContent>
+            <TabsContent value="smashkarts">
+              <ExternalGameEmbed
+                src="https://smashkarts.io"
+                title="Smash Karts"
+                developer="Tall Team"
+                description="Smash Karts is an explosive online multiplayer kart battle arena game. Drive armed karts and blast your opponents with a variety of weapons!"
               />
             </TabsContent>
             <TabsContent value="ageofwar">
