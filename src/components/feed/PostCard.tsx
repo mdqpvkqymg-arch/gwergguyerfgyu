@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Trash2, MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import PostComments from "./PostComments";
+import FollowButton from "./FollowButton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -121,6 +122,7 @@ const PostCard = ({ post, currentProfileId, onRefresh }: PostCardProps) => {
               {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
             </p>
           </div>
+          <FollowButton profileId={post.profile_id} currentProfileId={currentProfileId} />
         </div>
 
         {post.profile_id === currentProfileId && (
