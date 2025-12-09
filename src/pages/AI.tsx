@@ -3,14 +3,17 @@ import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send, Bot, User, Loader2, Home } from "lucide-react";
+import { ArrowLeft, Send, Bot, User, Loader2, Home, ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 
+type MessageContent = string | Array<{ type: "text"; text: string } | { type: "image_url"; image_url: { url: string } }>;
+
 type Message = {
   role: "user" | "assistant";
-  content: string;
+  content: MessageContent;
+  imageUrl?: string; // For display purposes
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
@@ -21,7 +24,7 @@ async function streamChat({
   onDone,
   onError,
 }: {
-  messages: Message[];
+  messages: Array<{ role: string; content: MessageContent }>;
   onDelta: (deltaText: string) => void;
   onDone: () => void;
   onError: (error: string) => void;
@@ -119,7 +122,10 @@ const AI = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -127,12 +133,56 @@ const AI = () => {
     }
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const userMsg: Message = { role: "user", content: input.trim() };
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be less than 5MB");
+      return;
+    }
+
+    setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearImage = () => {
+    setSelectedImage(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const sendMessage = async () => {
+    if ((!input.trim() && !selectedImage) || isLoading) return;
+
+    let userContent: MessageContent;
+    let displayImageUrl: string | undefined;
+
+    if (selectedImage) {
+      displayImageUrl = selectedImage;
+      userContent = [
+        ...(input.trim() ? [{ type: "text" as const, text: input.trim() }] : []),
+        { type: "image_url" as const, image_url: { url: selectedImage } }
+      ];
+    } else {
+      userContent = input.trim();
+    }
+
+    const userMsg: Message = { role: "user", content: userContent, imageUrl: displayImageUrl };
     setMessages(prev => [...prev, userMsg]);
     setInput("");
+    clearImage();
     setIsLoading(true);
 
     let assistantSoFar = "";
@@ -147,9 +197,15 @@ const AI = () => {
       });
     };
 
+    // Prepare messages for API (exclude imageUrl display property)
+    const apiMessages = [...messages, userMsg].map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
     try {
       await streamChat({
-        messages: [...messages, userMsg],
+        messages: apiMessages,
         onDelta: (chunk) => upsertAssistant(chunk),
         onDone: () => setIsLoading(false),
         onError: (error) => {
@@ -252,8 +308,17 @@ const AI = () => {
                           : "bg-white/20 text-white border border-white/20 rounded-bl-sm"
                       )}
                     >
+                      {msg.imageUrl && (
+                        <img 
+                          src={msg.imageUrl} 
+                          alt="Uploaded" 
+                          className="max-w-full max-h-64 rounded-lg mb-2"
+                        />
+                      )}
                       <p className="whitespace-pre-wrap break-words text-sm">
-                        {msg.content}
+                        {typeof msg.content === "string" 
+                          ? msg.content 
+                          : msg.content.find(c => c.type === "text")?.text || ""}
                       </p>
                     </div>
                     {msg.role === "user" && (
@@ -279,7 +344,39 @@ const AI = () => {
 
           {/* Input Area */}
           <div className="p-4 backdrop-blur-xl bg-white/10 border-t border-white/20">
+            {selectedImage && (
+              <div className="mb-3 relative inline-block">
+                <img 
+                  src={selectedImage} 
+                  alt="Selected" 
+                  className="max-h-32 rounded-lg border border-white/20"
+                />
+                <button
+                  onClick={clearImage}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            )}
             <div className="flex gap-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                ref={fileInputRef}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <ImagePlus className="h-5 w-5" />
+              </Button>
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -290,7 +387,7 @@ const AI = () => {
               />
               <Button 
                 onClick={sendMessage} 
-                disabled={isLoading || !input.trim()}
+                disabled={isLoading || (!input.trim() && !selectedImage)}
                 className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-lg transition-all duration-300 hover:scale-105"
               >
                 {isLoading ? (

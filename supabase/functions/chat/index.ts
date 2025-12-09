@@ -25,12 +25,14 @@ serve(async (req) => {
 
     // Validate each message
     for (const msg of messages) {
-      if (
-        typeof msg.role !== "string" ||
-        !["user", "assistant", "system"].includes(msg.role) ||
-        typeof msg.content !== "string" ||
-        msg.content.length > 10000
-      ) {
+      const isValidRole = typeof msg.role === "string" && ["user", "assistant", "system"].includes(msg.role);
+      const isStringContent = typeof msg.content === "string" && msg.content.length <= 10000;
+      const isArrayContent = Array.isArray(msg.content) && msg.content.every((item: any) => 
+        (item.type === "text" && typeof item.text === "string") ||
+        (item.type === "image_url" && item.image_url?.url)
+      );
+      
+      if (!isValidRole || (!isStringContent && !isArrayContent)) {
         console.error("Invalid message format:", msg);
         return new Response(JSON.stringify({ error: "Invalid message format" }), {
           status: 400,
