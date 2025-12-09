@@ -228,6 +228,7 @@ All colors MUST be HSL.
   filter: blur(60px);
   opacity: 0.4;
   animation: orb-float 20s ease-in-out infinite;
+  z-index: 0;
 }
 
 .dark .orb {
