@@ -45,16 +45,17 @@ export const MainHeader = ({
         {/* Logo Section */}
         <div className="flex items-center gap-3">
           <Link to="/" className="relative group">
-            <div className="h-11 w-11 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-lg border border-white/30 transition-all duration-300 group-hover:bg-white/30 group-hover:scale-105">
-              <MessageCircle className="h-6 w-6 text-white" />
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
+            <div className="relative h-11 w-11 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg border border-white/30 transition-all duration-300 group-hover:scale-105">
+              <span className="text-xl font-black text-white drop-shadow-md">S</span>
             </div>
-            <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full border-2 border-white/30 animate-pulse" />
+            <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-400 rounded-full border-2 border-white/50 animate-pulse shadow-lg shadow-emerald-400/50" />
           </Link>
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+            <h1 className="text-xl md:text-2xl font-black text-white flex items-center gap-2 tracking-tight">
               Scalk
             </h1>
-            <p className="text-xs text-white/60 hidden sm:block">Real-time Chat</p>
+            <p className="text-xs text-white/60 hidden sm:block font-medium">Real-time Chat</p>
           </div>
         </div>
 

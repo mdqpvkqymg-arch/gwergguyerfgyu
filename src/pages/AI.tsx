@@ -190,12 +190,15 @@ const AI = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-3 flex-1">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center shadow-lg">
-              <Bot className="h-5 w-5 text-white" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-xl blur-md opacity-50" />
+              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 via-indigo-500 to-cyan-500 flex items-center justify-center shadow-lg border border-white/30">
+                <Bot className="h-5 w-5 text-white drop-shadow-md" />
+              </div>
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-white">Scalk Bot</h1>
-              <p className="text-xs text-white/60">AI Assistant</p>
+              <h1 className="text-xl font-black text-white tracking-tight">Scalk Bot</h1>
+              <p className="text-xs text-white/60 font-medium">AI Assistant</p>
             </div>
           </div>
           <Button
