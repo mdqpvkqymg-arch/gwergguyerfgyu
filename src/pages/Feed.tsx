@@ -98,8 +98,41 @@ const Feed = () => {
       })
     );
 
-    setPosts(postsWithCounts);
+    // Weighted random shuffle based on engagement
+    const shuffledPosts = weightedRandomShuffle(postsWithCounts);
+    setPosts(shuffledPosts);
     setLoading(false);
+  };
+
+  // Weighted random shuffle - higher engagement = higher chance to appear earlier
+  const weightedRandomShuffle = (posts: Post[]): Post[] => {
+    if (posts.length === 0) return [];
+    
+    const result: Post[] = [];
+    const remaining = [...posts];
+    
+    while (remaining.length > 0) {
+      // Calculate weights based on engagement (likes + comments + 1 to avoid zero weight)
+      const weights = remaining.map(post => post.likes_count + post.comments_count + 1);
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+      
+      // Pick a random post based on weights
+      let random = Math.random() * totalWeight;
+      let selectedIndex = 0;
+      
+      for (let i = 0; i < weights.length; i++) {
+        random -= weights[i];
+        if (random <= 0) {
+          selectedIndex = i;
+          break;
+        }
+      }
+      
+      result.push(remaining[selectedIndex]);
+      remaining.splice(selectedIndex, 1);
+    }
+    
+    return result;
   };
 
   useEffect(() => {
