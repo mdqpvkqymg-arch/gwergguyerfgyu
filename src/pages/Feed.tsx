@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { Home, Plus } from "lucide-react";
+import { Home, Plus, Users, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PostCard from "@/components/feed/PostCard";
 import CreatePostDialog from "@/components/feed/CreatePostDialog";
@@ -25,6 +25,8 @@ interface Post {
   user_liked: boolean;
 }
 
+type FeedTab = "for-you" | "following";
+
 const Feed = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -32,6 +34,8 @@ const Feed = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<FeedTab>("for-you");
+  const [followingIds, setFollowingIds] = useState<string[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -64,16 +68,48 @@ const Feed = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  // Fetch who the user is following
+  const fetchFollowing = async () => {
+    if (!currentProfileId) return;
+
+    const { data } = await supabase
+      .from("follows")
+      .select("following_id")
+      .eq("follower_id", currentProfileId);
+
+    if (data) {
+      setFollowingIds(data.map(f => f.following_id));
+    }
+  };
+
+  useEffect(() => {
+    if (currentProfileId) {
+      fetchFollowing();
+    }
+  }, [currentProfileId]);
+
   const fetchPosts = async () => {
     if (!currentProfileId) return;
 
-    const { data: postsData, error } = await supabase
+    let query = supabase
       .from("posts")
       .select(`
         *,
         profiles(display_name, avatar_color, avatar_url)
       `)
       .order("created_at", { ascending: false });
+
+    // If on "following" tab, filter to only followed users
+    if (activeTab === "following" && followingIds.length > 0) {
+      query = query.in("profile_id", followingIds);
+    } else if (activeTab === "following" && followingIds.length === 0) {
+      // No following, return empty
+      setPosts([]);
+      setLoading(false);
+      return;
+    }
+
+    const { data: postsData, error } = await query;
 
     if (error) {
       console.error("Error fetching posts:", error);
@@ -139,9 +175,9 @@ const Feed = () => {
     if (currentProfileId) {
       fetchPosts();
     }
-  }, [currentProfileId]);
+  }, [currentProfileId, activeTab, followingIds]);
 
-  // Realtime subscription for new posts
+  // Realtime subscription for changes
   useEffect(() => {
     const channel = supabase
       .channel("posts-changes")
@@ -166,6 +202,13 @@ const Feed = () => {
           fetchPosts();
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "follows" },
+        () => {
+          fetchFollowing();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -186,33 +229,61 @@ const Feed = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/10 border-b border-white/20">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/")}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
-            >
-              <Home className="w-5 h-5 text-white" />
-            </button>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-orange-500 rounded-xl blur-lg opacity-50 group-hover:opacity-70 transition-opacity" />
-              <div className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-orange-500">
-                <span className="text-xl font-bold text-white">Feed</span>
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                <Home className="w-5 h-5 text-white" />
+              </button>
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-orange-500 rounded-xl blur-lg opacity-50 group-hover:opacity-70 transition-opacity" />
+                <div className="relative flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-orange-500">
+                  <span className="text-xl font-bold text-white">Feed</span>
+                </div>
               </div>
             </div>
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white shadow-lg"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Post
+            </Button>
           </div>
-          <Button
-            onClick={() => setCreateDialogOpen(true)}
-            className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white shadow-lg"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Post
-          </Button>
+
+          {/* Tab switcher */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab("for-you")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl transition-all ${
+                activeTab === "for-you"
+                  ? "bg-white/20 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <Globe className="w-4 h-4" />
+              For You
+            </button>
+            <button
+              onClick={() => setActiveTab("following")}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-xl transition-all ${
+                activeTab === "following"
+                  ? "bg-white/20 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              Following
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Feed content - Instagram-style snap scrolling */}
-      <main className="relative z-10 h-[calc(100vh-73px)] overflow-y-auto snap-y snap-mandatory">
+      <main className="relative z-10 h-[calc(100vh-130px)] overflow-y-auto snap-y snap-mandatory">
         {loading ? (
           <div className="h-full flex items-center justify-center">
             <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
@@ -220,16 +291,26 @@ const Feed = () => {
         ) : posts.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center">
             <div className="w-20 h-20 mb-4 rounded-2xl bg-white/20 flex items-center justify-center">
-              <Plus className="w-10 h-10 text-white/70" />
+              {activeTab === "following" ? (
+                <Users className="w-10 h-10 text-white/70" />
+              ) : (
+                <Plus className="w-10 h-10 text-white/70" />
+              )}
             </div>
-            <p className="text-lg font-medium text-white">No posts yet</p>
-            <p className="text-sm mt-2 text-white/60">Be the first to share something!</p>
+            <p className="text-lg font-medium text-white">
+              {activeTab === "following" ? "No posts from people you follow" : "No posts yet"}
+            </p>
+            <p className="text-sm mt-2 text-white/60">
+              {activeTab === "following" 
+                ? "Follow people to see their posts here!" 
+                : "Be the first to share something!"}
+            </p>
           </div>
         ) : (
-          posts.map((post, index) => (
+          posts.map((post) => (
             <div 
               key={post.id} 
-              className="h-[calc(100vh-73px)] snap-start snap-always flex items-center justify-center p-4"
+              className="h-[calc(100vh-130px)] snap-start snap-always flex items-center justify-center p-4"
             >
               <div className="w-full max-w-lg">
                 <PostCard
