@@ -10,6 +10,7 @@ import Game from "./pages/Game";
 import ExternalGame from "./pages/ExternalGame";
 import AI from "./pages/AI";
 import Admin from "./pages/Admin";
+import Feed from "./pages/Feed";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/embed" element={<ExternalGame />} />
           <Route path="/ai" element={<AI />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/feed" element={<Feed />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

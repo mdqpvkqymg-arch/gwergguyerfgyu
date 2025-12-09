@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface UseImageUploadOptions {
-  bucket: "chat-attachments" | "avatars";
+  bucket: "chat-attachments" | "avatars" | "post-media";
   maxSizeMB?: number;
 }
 
