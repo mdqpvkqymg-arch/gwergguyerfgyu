@@ -36,6 +36,7 @@ const Feed = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<FeedTab>("for-you");
   const [followingIds, setFollowingIds] = useState<string[]>([]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -175,7 +176,19 @@ const Feed = () => {
     if (currentProfileId) {
       fetchPosts();
     }
-  }, [currentProfileId, activeTab, followingIds]);
+  }, [currentProfileId, activeTab, followingIds, refreshKey]);
+
+  // Reshuffle on page visibility (when user returns to tab/app)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        setRefreshKey(prev => prev + 1);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   // Realtime subscription for changes
   useEffect(() => {
