@@ -20,13 +20,18 @@ const Feed = () => {
         <h1 className="text-xl font-bold text-white">TikTok</h1>
       </div>
 
-      {/* Embedded TikTok - cropped to only show content */}
+      {/* Embedded TikTok - cropped to hide site's top bar */}
       <div className="flex-1 relative overflow-hidden">
         <iframe
           src="https://pixelforces.io/app2/Tik%20Tok/"
           title="TikTok"
-          className="w-full h-full border-0"
-          style={{ minHeight: "calc(100vh - 64px)" }}
+          className="absolute border-0"
+          style={{
+            top: "-50px",
+            left: 0,
+            width: "100%",
+            height: "calc(100% + 50px)",
+          }}
           allow="fullscreen; autoplay; clipboard-write"
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
         />
